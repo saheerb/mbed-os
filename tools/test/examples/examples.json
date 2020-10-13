@@ -479,7 +479,7 @@
       "compile" : true,
       "export": true,
       "test" : true,
-      "baud_rate": 115200,
+      "baud_rate": 9600,
       "compare_log": ["mbed-os-example-for-aws/tests/aws.log"],
       "auto-update" : true
     },
@@ -495,7 +495,7 @@
       "compile" : true,
       "export": true,
       "test" : false,
-      "baud_rate": 115200,
+      "baud_rate": 9600,
       "auto-update" : true
     },
     {
@@ -510,7 +510,7 @@
       "compile" : true,
       "export": true,
       "test" : false,
-      "baud_rate": 115200,
+      "baud_rate": 9600,
       "auto-update" : true
     }
   ]
