@@ -59,13 +59,16 @@ def get_digest(ctx, repository, tag, platform=None):
 @click.option("-r", "--repository", required=True)
 @click.option("-t", "--tag", required=True)
 def delete_tag(ctx, repository, tag):
-    jwt = _get_jwt(ctx.obj['username'], ctx.obj['passwd']),
+    jwt = _get_jwt(ctx.obj['username'], ctx.obj['passwd'])
     url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}"
 
     headers = {"Authorization": f"JWT {jwt}", "Accept": "application/json"}
     resp = requests.delete(url, headers=headers)
 
+
     if resp.status_code != 204:
+        logging.error(resp.status_code)
+        logging.error(resp)
         logging.error("Request failed, check credentials")
         sys.exit(1)
 
