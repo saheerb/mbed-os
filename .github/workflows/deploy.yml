@@ -47,6 +47,12 @@ jobs:
 
       - 
         name: Find the latest release mbed-os version
+        shell: bash
+        run: |
+          ls
+
+      - 
+        name: Find the latest release mbed-os version
         id: mbed_os_version
         shell: bash
         run: |
@@ -126,7 +132,13 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v2
-        
+
+      - 
+        name: Find the latest release mbed-os version
+        shell: bash
+        run: |
+          ls
+
       -
         name: Build with remote cache
         uses: docker/build-push-action@v2
