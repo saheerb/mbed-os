@@ -135,7 +135,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64 
           push: true
-          file: ./docker-images/mbed-os-env/Dockerfile
+          file: ./docker_images/mbed-os-env/Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:latest
           cache-to: type=inline
