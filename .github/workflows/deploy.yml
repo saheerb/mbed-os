@@ -43,7 +43,7 @@ jobs:
         id: mbed_os_version
         shell: bash
         run: |
-          value=`cgit describe --tags --abbrev=0  --match mbed-os-*.[0-9]`
+          value=`git describe --tags --abbrev=0  --match mbed-os-*.[0-9]`
           echo "TAG is $value"
           echo "::set-output name=tag::$value"
 
