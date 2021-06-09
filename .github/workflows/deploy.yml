@@ -37,7 +37,12 @@ jobs:
   prepare-tags:
     runs-on: ubuntu-latest
 
+
     steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+
       - 
         name: Find the latest release mbed-os version
         id: mbed_os_version
