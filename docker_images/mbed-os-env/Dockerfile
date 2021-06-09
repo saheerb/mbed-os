@@ -8,6 +8,9 @@ ARG WORKDIR=/root
 
 # ------------------------------------------------------------------------------
 # Install tools via apt
+RUN ls
+
+ADD requirements.txt .
 ENV DEBIAN_FRONTEND=noninteractive
 RUN set -x \
     && apt -y update \
@@ -52,6 +55,7 @@ RUN set -x \
 
 # Set up mbed environment
 WORKDIR /tmp/
+COPY requirements.txt .
 RUN set -x \
     && pip3 install -r requirements.txt  \
     && : # last line
