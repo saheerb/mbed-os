@@ -28,7 +28,7 @@ on:
   #   - cron:  '15 4 * * *'
     
   push:
-    branches: [ master ]
+    branches: [ master, mbed-os-env ]
 
 
   workflow_dispatch:
