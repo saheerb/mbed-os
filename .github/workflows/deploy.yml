@@ -199,7 +199,7 @@ jobs:
         name: Find DOCKER DIGEST trying to publish (if exists in docker hub)
         id: docker_info_prod
         run: |
-          DIGEST=$(python ./ci_scripts/docker_hub_utils.py -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} get-digest -r mbed-os-env -t ${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }} -p ${{ matrix.platform }} )
+          DIGEST=$(python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} get-digest -r mbed-os-env -t ${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }} -p ${{ matrix.platform }} )
           echo "::set-output name=DIGEST::$DIGEST"
           echo "Docker DIGEST: $DIGEST"
 
@@ -207,7 +207,7 @@ jobs:
         name: Find DEV DOCKER DIGEST
         id: docker_info_dev
         run: |
-          DIGEST=$(python ./ci_scripts/docker_hub_utils.py -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} get-digest -r mbed-os-env -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }} -p ${{ matrix.platform }} )
+          DIGEST=$(python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} get-digest -r mbed-os-env -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }} -p ${{ matrix.platform }} )
           echo "::set-output name=DIGEST::$DIGEST"
           echo "Docker DIGEST: $DIGEST"
 
@@ -280,4 +280,4 @@ jobs:
       - 
         name: Delete Dev Tag
         run: |
-          python ./ci_scripts/docker_hub_utils.py -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} delete-tag -r mbed-os-env -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+          python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} delete-tag -r mbed-os-env -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
