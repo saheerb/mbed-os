@@ -11,7 +11,6 @@ import sys
 def _get_jwt(username, password):
     url = "https://hub.docker.com/v2/users/login/"
     params = {"username": username, "password": password}
-
     resp = requests.post(url, json=params)
     if 200 != resp.status_code:
         logging.error("Couldn't authenicate")
@@ -28,8 +27,6 @@ def _get_jwt(username, password):
 def get_digest(ctx, repository, tag, platform=None):
     url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}/"
 
-    #headers = {"Authorization": f"JWT {ctx.obj['jwt']}", "Accept": "application/json"}
-    #resp = requests.get(url, headers=headers)
     resp = requests.get(url)
 
     if resp.status_code != 200:
@@ -62,9 +59,10 @@ def get_digest(ctx, repository, tag, platform=None):
 @click.option("-r", "--repository", required=True)
 @click.option("-t", "--tag", required=True)
 def delete_tag(ctx, repository, tag):
+    jwt = _get_jwt(ctx.obj['username'], ctx.obj['passwd']),
     url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}"
 
-    headers = {"Authorization": f"JWT {ctx.obj['jwt']}", "Accept": "application/json"}
+    headers = {"Authorization": f"JWT {jwt}", "Accept": "application/json"}
     resp = requests.delete(url, headers=headers)
 
     if resp.status_code != 204:
