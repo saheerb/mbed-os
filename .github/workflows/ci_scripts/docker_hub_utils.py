@@ -40,7 +40,7 @@ def get_digest(ctx, repository, tag, platform=None):
         sys.exit(0)
 
     print (resp.json())
-    images = resp.json()["images"]
+    images = resp.json()["manifests"]
     digest = ""
     if len(images) > 1 and platform == None:
         logging.error(
@@ -51,8 +51,8 @@ def get_digest(ctx, repository, tag, platform=None):
 
     for image in images:
         if platform != None:
-            if (platform.split("/")[0] == image["os"]) and (
-                platform.split("/")[1] == image["architecture"]
+            if (platform.split("/")[0] == image["platform"]["os"]) and (
+                platform.split("/")[1] == image["platform"]["architecture"]
             ):
                 digest = image["digest"]
         else:
@@ -66,11 +66,14 @@ def get_digest(ctx, repository, tag, platform=None):
 @click.option("-r", "--repository", required=True)
 @click.option("-t", "--tag", required=True)
 def delete_tag(ctx, repository, tag):
-    jwt = _get_jwt(ctx.obj['username'], ctx.obj['passwd'])
-    url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}"
+    url = f"https://ghcr.io/v2/{ctx.obj['username']}/{repository}/manifests/{tag}"
+    print (url)
+    # jwt = _get_jwt(ctx.obj['username'], ctx.obj['passwd'])
+    # url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}"
 
-    headers = {"Authorization": f"JWT {jwt}", "Accept": "application/json"}
-    resp = requests.delete(url, headers=headers)
+    # headers = {"Authorization": f"JWT {jwt}", "Accept": "application/json"}
+    # resp = requests.delete(url, headers=headers)
+    resp = requests.delete(url, auth=(ctx.obj['username'], ctx.obj['passwd']))
 
 
     if resp.status_code != 204:

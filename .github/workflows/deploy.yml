@@ -126,7 +126,7 @@ jobs:
         name: Login to DockerHub
         uses: docker/login-action@v1 
         with:
-          # username: ${{ secrets.DOCKERHUB_USERNAME }}
+          # username: ${{ github.actor }}
           # password: ${{ secrets.DOCKERHUB_PASSWORD }}
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -138,7 +138,7 @@ jobs:
       #   name: Login to DockerHub
       #   uses: docker/login-action@v1 
       #   with:
-      #     # username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     # username: ${{ github.actor }}
       #     # password: ${{ secrets.DOCKERHUB_PASSWORD }}
       #     registry: docker.pkg.github.com
       #     username: ${{ github.actor }}
@@ -168,7 +168,7 @@ jobs:
           file: ./docker_images/mbed-os-env/Dockerfile
           tags: ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
           # tags: docker.pkg.github.com/${{ github.repository_owner }}/mbed-os/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
-          # cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:latest
+          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/mbed-os-env:latest
           cache-to: type=inline
 
 
@@ -184,7 +184,7 @@ jobs:
       #     file: ./docker_images/mbed-os-env/Dockerfile
       #     tags: docker.pkg.github.com/${{ github.repository }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
       #     # tags: docker.pkg.github.com/${{ github.repository_owner }}/mbed-os/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
-      #     # cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:latest
+      #     # cache-from: type=registry,ref=${{ github.actor }}/mbed-os-env:latest
       #     cache-to: type=inline
 
 
@@ -195,8 +195,8 @@ jobs:
       STATUS: ${{ steps.test.outputs.STATUS }}
     strategy:
       matrix:
-        # platform: [linux/amd64, linux/arm64]
-        platform: [linux/amd64]
+        platform: [linux/amd64, linux/arm64]
+        # platform: [linux/amd64]
         
     steps:
       - 
@@ -233,7 +233,7 @@ jobs:
         name: Find DOCKER DIGEST trying to publish (if exists in docker hub)
         id: docker_info_prod
         run: |
-          DIGEST=$(python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} get-digest -r mbed-os-env -t ${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }} -p ${{ matrix.platform }} )
+          DIGEST=$(python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} get-digest -r mbed-os-env -t ${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }} -p ${{ matrix.platform }} )
           echo "::set-output name=DIGEST::$DIGEST"
           echo "Docker DIGEST: $DIGEST"
 
@@ -241,7 +241,7 @@ jobs:
         name: Find DEV DOCKER DIGEST
         id: docker_info_dev
         run: |
-          DIGEST=$(python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} get-digest -r mbed-os-env -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }} -p ${{ matrix.platform }} )
+          DIGEST=$(python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} get-digest -r mbed-os-env -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }} -p ${{ matrix.platform }} )
           echo "::set-output name=DIGEST::$DIGEST"
           echo "Docker DIGEST: $DIGEST"
 
@@ -249,8 +249,8 @@ jobs:
         name: Login to DockerHub
         uses: docker/login-action@v1 
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # no need to test (nor publish) if we already have the same image in dockerhub
       - if: steps.docker_info_prod.outputs.DIGEST != steps.docker_info_dev.outputs.DIGEST
@@ -259,7 +259,7 @@ jobs:
         uses: addnab/docker-run-action@v2
         with:
           options: -v ${{ github.workspace }}:/work -w=/work
-          image: ${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env@${{ steps.docker_info_dev.outputs.DIGEST }}
+          image: ${{ github.actor }}/mbed-os-env@${{ steps.docker_info_dev.outputs.DIGEST }}
           shell: bash
           run: |
             set -e
@@ -302,16 +302,16 @@ jobs:
       - if: needs.test-container.outputs.STATUS == 'passed'
         name: copy dev tag to prod
         run: |
-          docker run quay.io/skopeo/stable --src-creds=${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_PASSWORD }} --dest-creds=${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_PASSWORD }} copy --all docker://docker.io/${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://docker.io/${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }}
-          docker run quay.io/skopeo/stable --src-creds=${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_PASSWORD }} --dest-creds=${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_PASSWORD }} copy --all docker://docker.io/${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://docker.io/${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_DATED }}
-          docker run quay.io/skopeo/stable --src-creds=${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_PASSWORD }} --dest-creds=${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_PASSWORD }} copy --all docker://docker.io/${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://docker.io/${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:latest
+          docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }}
+          docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_DATED }}
+          docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:latest
       
       - if: needs.test-container.outputs.STATUS == 'failed'
         name: Rename Dev Tag
         run: |
-          docker run quay.io/skopeo/stable --src-creds=${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_PASSWORD }} --dest-creds=${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_PASSWORD }} copy --all docker://docker.io/${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://docker.io/${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:failed-${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+          docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:failed-${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
 
       - 
         name: Delete Dev Tag
         run: |
-          python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }} delete-tag -r mbed-os-env -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+          python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} delete-tag -r mbed-os-env -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
