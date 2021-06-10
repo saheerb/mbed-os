@@ -25,14 +25,21 @@ def _get_jwt(username, password):
 @click.option("-t", "--tag", required=True)
 @click.option("-p", "--platform", required=False)
 def get_digest(ctx, repository, tag, platform=None):
-    url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}/"
+    url = f"https://ghcr.io/v2/{ctx.obj['username']}/{repository}/manifests/{tag}"
+    # {tag}"
+    # url = f"https://registry.ghcr.io/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}/"
 
-    resp = requests.get(url)
+    # url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}/"
+
+    print (url)
+    resp = requests.get(url, auth=(ctx.obj['username'], ctx.obj['passwd']))
 
     if resp.status_code != 200:
+        print (resp)
         logging.warning("Request failed, perhaps tag is not present")
         sys.exit(0)
 
+    print (resp.json())
     images = resp.json()["images"]
     digest = ""
     if len(images) > 1 and platform == None:
