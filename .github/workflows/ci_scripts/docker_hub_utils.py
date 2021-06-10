@@ -31,15 +31,15 @@ def get_digest(ctx, repository, tag, platform=None):
 
     # url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}/"
 
-    print (url)
+    # print (url)
     resp = requests.get(url, auth=(ctx.obj['username'], ctx.obj['passwd']))
 
     if resp.status_code != 200:
-        print (resp)
+        # print (resp)
         logging.warning("Request failed, perhaps tag is not present")
         sys.exit(0)
 
-    print (resp.json())
+    # print (resp.json())
     images = resp.json()["manifests"]
     digest = ""
     if len(images) > 1 and platform == None:
@@ -67,7 +67,7 @@ def get_digest(ctx, repository, tag, platform=None):
 @click.option("-t", "--tag", required=True)
 def delete_tag(ctx, repository, tag):
     url = f"https://ghcr.io/v2/{ctx.obj['username']}/{repository}/manifests/{tag}"
-    print (url)
+    # print (url)
     # jwt = _get_jwt(ctx.obj['username'], ctx.obj['passwd'])
     # url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}"
 
