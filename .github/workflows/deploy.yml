@@ -128,7 +128,7 @@ jobs:
         with:
           # username: ${{ secrets.DOCKERHUB_USERNAME }}
           # password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          registry: ghcr.io
+          registry: docker.pkg.github.com
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -152,7 +152,7 @@ jobs:
           platforms: linux/amd64
           push: true
           file: ./docker_images/mbed-os-env/Dockerfile
-          tags: ghcr.io/${{ github.repository_owner }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+          tags: docker.pkg.github.com/${{ github.repository_owner }}/mbed-os/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
           # cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/mbed-os-env:latest
           cache-to: type=inline
 
