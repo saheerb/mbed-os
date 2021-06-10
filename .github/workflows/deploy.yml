@@ -260,7 +260,7 @@ jobs:
         uses: addnab/docker-run-action@v2
         with:
           options: -v ${{ github.workspace }}:/work -w=/work
-          image: ${{ github.actor }}/mbed-os-env@${{ steps.docker_info_dev.outputs.DIGEST }}
+          image: ghcr.io/${{ github.actor }}/mbed-os-env@${{ steps.docker_info_dev.outputs.DIGEST }}
           shell: bash
           run: |
             set -e
