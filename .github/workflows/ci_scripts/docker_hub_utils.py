@@ -114,5 +114,5 @@ def main(ctx, username, passwd, verbose):
 
 if __name__ == "__main__":
     main.add_command(get_digest)
-    main.add_command(delete_tag)
+    main.add_command(delete_image)
     main()
