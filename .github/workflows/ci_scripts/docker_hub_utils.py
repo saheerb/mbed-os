@@ -65,8 +65,9 @@ def get_digest(ctx, repository, tag, platform=None):
 @click.pass_context
 @click.option("-r", "--repository", required=True)
 @click.option("-t", "--tag", required=True)
-def delete_tag(ctx, repository, tag):
+def delete_image(ctx, repository, tag):
     url = f"https://ghcr.io/v2/{ctx.obj['username']}/{repository}/manifests/{tag}"
+    url = f'https://api.github.com/user/packages/container/{repository}/versions/{v["id"]}'
     # print (url)
     # jwt = _get_jwt(ctx.obj['username'], ctx.obj['passwd'])
     # url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}"
