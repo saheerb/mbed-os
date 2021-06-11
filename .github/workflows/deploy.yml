@@ -317,7 +317,7 @@ jobs:
         with:
           # NOTE: at now only orgs is supported
           owner: ${{ github.actor }}
-          name: mbed-os-end
+          name: ghcr.io/${{ github.actor }}/mbed-os-env
           # NOTE: using Personal Access Token
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
