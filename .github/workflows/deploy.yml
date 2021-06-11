@@ -164,7 +164,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           # platforms: linux/amd64
-          push: true
+          load: true
           file: ./docker_images/mbed-os-env/Dockerfile
           tags: ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
           # tags: docker.pkg.github.com/${{ github.repository_owner }}/mbed-os/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
