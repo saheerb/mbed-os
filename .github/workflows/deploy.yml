@@ -172,20 +172,6 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/mbed-os-env:latest
           cache-to: type=inline
 
-      -
-        name: Build with remote cache
-        uses: docker/build-push-action@v2
-        id: docker_build_dev1
-        with:
-          context: .
-          platforms: linux/amd64
-          push: true
-          file: ./docker_images/mbed-os-env/Dockerfile
-          tags: ghcr.io/${{ github.actor }}/mbed-os-env:test
-          # tags: docker.pkg.github.com/${{ github.repository_owner }}/mbed-os/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/mbed-os-env:latest
-          cache-to: type=inline
-
       - name: Check if we need to rebuild
         id: check-need-build2
         run: |
