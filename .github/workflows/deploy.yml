@@ -171,6 +171,11 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/mbed-os-env:latest
           cache-to: type=inline
 
+      - name: Check if we need to rebuild
+        id: check-need-build
+        run: |
+          docker manifest inspect ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+          docker manifest inspect ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }}
 
       # -
       #   name: Build with remote cache
