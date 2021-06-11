@@ -159,7 +159,7 @@ jobs:
           file: ./docker_images/mbed-os-env/Dockerfile
           tags: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
           # tags: docker.pkg.github.com/${{ github.repository_owner }}/mbed-os/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/mbed-os-env-tmp:latest
+          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }}
           cache-to: type=inline
 
     
