@@ -175,7 +175,7 @@ jobs:
       -
         name: Build with remote cache
         uses: docker/build-push-action@v2
-        id: docker_build_dev
+        id: docker_build_dev1
         with:
           context: .
           platforms: linux/amd64
@@ -187,7 +187,7 @@ jobs:
           cache-to: type=inline
 
       - name: Check if we need to rebuild
-        id: check-need-build
+        id: check-need-build2
         run: |
           docker manifest inspect ghcr.io/${{ github.actor }}/mbed-os-env:test
         # docker manifest inspect ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }}
