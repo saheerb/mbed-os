@@ -42,14 +42,9 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v2
+        depth: 0
 
-      - run: git fetch --prune --unshallow
-
-      - 
-        name: Find the latest release mbed-os version
-        shell: bash
-        run: |
-          ls
+      # - run: git fetch --prune --unshallow
 
       - 
         name: Find the latest release mbed-os version
@@ -150,12 +145,6 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
 
-      - 
-        name: Find the latest release mbed-os version
-        shell: bash
-        run: |
-          ls
-
       -
         name: Build with remote cache
         uses: docker/build-push-action@v2
@@ -169,7 +158,7 @@ jobs:
           file: ./docker_images/mbed-os-env/Dockerfile
           tags: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
           # tags: docker.pkg.github.com/${{ github.repository_owner }}/mbed-os/mbed-os-env:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/mbed-os-env:latest
+          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/mbed-os-env-tmp:latest
           cache-to: type=inline
 
     
