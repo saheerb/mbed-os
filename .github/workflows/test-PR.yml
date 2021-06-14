@@ -3,11 +3,15 @@ name: build and test image
 on:
   pull_request:
     branches: [ master ]
+    paths:
+      - docker_images/mbed-os-env
+      - .github/workflows
 
 jobs:
 
   build-container:
     runs-on: ubuntu-latest
+    
 
     strategy:
       matrix:
