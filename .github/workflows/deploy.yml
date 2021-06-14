@@ -224,7 +224,7 @@ jobs:
   test-container:
     runs-on: ubuntu-latest
     needs: build-container
-    # if: needs.build-container.outputs.DEV_DIGEST != needs.build-container.outputs.PROD_DIGEST
+    if: needs.build-container.outputs.DEV_DIGEST != needs.build-container.outputs.PROD_DIGEST
     outputs:
       STATUS: ${{ steps.test.outputs.STATUS }}
     strategy:
@@ -356,6 +356,11 @@ jobs:
         run: |
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:failed-${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
 
+
+      - 
+        name: delete dev image
+        run: |
+          docker run quay.io/skopeo/stable --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} delete docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
 
       # - name: Delete image
       #   uses: bots-house/ghcr-delete-image-action@v1.0.0
