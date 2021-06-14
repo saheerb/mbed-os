@@ -4,8 +4,8 @@ on:
   pull_request:
     branches: [ master ]
     paths:
-      - docker_images/mbed-os-env
-      - .github/workflows
+      - docker_images/mbed-os-env/**
+      - .github/workflows/**
 
 jobs:
 
