@@ -357,10 +357,10 @@ jobs:
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:failed-${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
 
 
-      # - 
-      #   name: delete dev image
-      #   run: |
-      #     docker run quay.io/skopeo/stable --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} delete docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+      - 
+        name: delete dev image
+        run: |
+          docker run quay.io/skopeo/stable --creds=${{ github.actor }}:${{ secrets.ANOTHER_GITHUB_TOKEN }} delete docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
 
       # - name: Delete image
       #   uses: bots-house/ghcr-delete-image-action@v1.0.0
@@ -369,12 +369,12 @@ jobs:
       #     owner: ${{ github.actor }}
       #     name: ghcr.io/${{ github.actor }}/mbed-os-env-tmp
       #     # NOTE: using Personal Access Token
-      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     token: ${{ secrets.ANOTHER_GITHUB_TOKEN }}
       #     tag: ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
 
-      - 
-        name: Delete Dev image
-        run: |
-          python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.ANOTHER_GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+      # - 
+      #   name: Delete Dev image
+      #   run: |
+      #     python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.ANOTHER_GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
 
-        # python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+      #   # python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
