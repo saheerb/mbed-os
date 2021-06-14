@@ -372,7 +372,7 @@ jobs:
       #     token: ${{ secrets.ANOTHER_GITHUB_TOKEN }}
       #     tag: ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
 
-      normal GITHUB_TOKEN is not working and had to create a personal access token
+      # normal GITHUB_TOKEN is not working and had to create a personal access token
       - 
         name: Delete Dev image
         run: |
