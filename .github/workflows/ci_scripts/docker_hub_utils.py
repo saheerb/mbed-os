@@ -74,9 +74,13 @@ def delete_image(ctx, repository, tag):
     versions = r.json()
     version_id = None
     for version in versions:
-        if tag in version['metadata']['container']['tags']:
-            version_id = (version['id'])
-            break
+        print (version)
+        try:
+            if tag in version['metadata']['container']['tags']:
+                version_id = (version['id'])
+                break
+        except:
+            pass
 
     # url = f"https://ghcr.io/v2/{ctx.obj['username']}/{repository}/manifests/{tag}"
     url = f'https://api.github.com/user/packages/container/{repository}/versions/{version_id}'
