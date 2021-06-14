@@ -299,9 +299,11 @@ jobs:
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
           options: -v ${{ github.workspace }}:/work -w=/work
+
           # image: ghcr.io/${{ github.actor }}/mbed-os-env-tmp@${{ steps.docker_info_dev.outputs.DIGEST }}
-          image: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+          image: ${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
           shell: bash
           run: |
             set -e
