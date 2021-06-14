@@ -67,7 +67,7 @@ def get_digest(ctx, repository, tag, platform=None):
 @click.option("-t", "--tag", required=True)
 def delete_image(ctx, repository, tag):
     s = requests.Session()
-    s.headers.update({'Authorization': f'token {ctx.obj['passwd']}', 'Accept': github_api_accept})
+    s.headers.update({'Authorization': f'token {ctx.obj["passwd"]}', 'Accept': github_api_accept})
 
     r = s.get(f'https://api.github.com/user/packages/container/{repository}/versions')
     versions = r.json()
