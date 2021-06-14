@@ -66,15 +66,28 @@ def get_digest(ctx, repository, tag, platform=None):
 @click.option("-r", "--repository", required=True)
 @click.option("-t", "--tag", required=True)
 def delete_image(ctx, repository, tag):
-    url = f"https://ghcr.io/v2/{ctx.obj['username']}/{repository}/manifests/{tag}"
-    url = f'https://api.github.com/user/packages/container/{repository}/versions/{v["id"]}'
+    s = requests.Session()
+    s.headers.update({'Authorization': f'token {ctx.obj['passwd']}', 'Accept': github_api_accept})
+
+    r = s.get(f'https://api.github.com/user/packages/container/{repository}/versions')
+    versions = r.json()
+    version_id = None
+    for version in versions:
+        if tag in version['metadata']['container']['tags']:
+            version_id = (version['id'])
+            break
+
+    # url = f"https://ghcr.io/v2/{ctx.obj['username']}/{repository}/manifests/{tag}"
+    url = f'https://api.github.com/user/packages/container/{repository}/versions/{version_id}'
     # print (url)
     # jwt = _get_jwt(ctx.obj['username'], ctx.obj['passwd'])
     # url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}"
 
     # headers = {"Authorization": f"JWT {jwt}", "Accept": "application/json"}
     # resp = requests.delete(url, headers=headers)
-    resp = requests.delete(url, auth=(ctx.obj['username'], ctx.obj['passwd']))
+    resp = s.delete(url)
+    resp.raise_for_status()
+    # , auth=(ctx.obj['username'], ctx.obj['passwd']))
 
 
     if resp.status_code != 204:
