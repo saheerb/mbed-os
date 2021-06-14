@@ -376,5 +376,5 @@ jobs:
       - 
         name: Delete Dev image
         run: |
-          # python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.ANOTHER_GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
-          python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+          python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.ANOTHER_GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+          # python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
