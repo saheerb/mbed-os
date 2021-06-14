@@ -69,8 +69,6 @@ def delete_image(ctx, repository, tag):
     s = requests.Session()
     github_api_accept = 'application/vnd.github.v3+json'
     s.headers.update({'Authorization': f'token {ctx.obj["passwd"]}', 'Accept': github_api_accept})
-    print (ctx.obj["passwd"])
-    print (ctx.obj["user"])
     r = s.get(f'https://api.github.com/user/packages/container/{repository}/versions')
     versions = r.json()
     version_id = None
