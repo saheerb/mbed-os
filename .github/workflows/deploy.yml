@@ -30,8 +30,8 @@ on:
   push:
     branches: [ master, mbed-os-env ]
     paths:
-      - docker_images/mbed-os-env
-      - .github/workflows
+      - docker_images/mbed-os-env/**
+      - .github/workflows/**
 
 
   workflow_dispatch:
