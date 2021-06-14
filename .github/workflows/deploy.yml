@@ -41,7 +41,7 @@ jobs:
         name: Find DOCKER DIGEST trying to publish (if exists in docker hub)
         id: docker_info_prod
         run: |
-          docker run quay.io/skopeo/stable --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} inspect docker://ghcr.io/${{ github.actor }}/mbed-os-env:latest --raw
+          docker run quay.io/skopeo/stable --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} inspect docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:latest --raw
           DIGEST=$(docker run quay.io/skopeo/stable --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} inspect docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:latest --raw)
           echo "Docker DIGEST: $DIGEST"
           echo "::set-output name=DIGEST::$DIGEST"
