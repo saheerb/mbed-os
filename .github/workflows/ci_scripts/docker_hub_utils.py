@@ -35,7 +35,7 @@ def get_digest(ctx, repository, tag, platform=None):
     resp = requests.get(url, auth=(ctx.obj['username'], ctx.obj['passwd']))
 
     if resp.status_code != 200:
-        # print (resp)
+        print (resp)
         logging.warning("Request failed, perhaps tag is not present")
         sys.exit(0)
 
