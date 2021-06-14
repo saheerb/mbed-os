@@ -296,9 +296,9 @@ jobs:
         name: test the container
         id: test
         uses: addnab/docker-run-action@v3
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
         with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
           options: -v ${{ github.workspace }}:/work -w=/work
           # image: ghcr.io/${{ github.actor }}/mbed-os-env-tmp@${{ steps.docker_info_dev.outputs.DIGEST }}
           image: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
