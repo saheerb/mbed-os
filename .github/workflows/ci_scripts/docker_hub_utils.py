@@ -74,6 +74,7 @@ def delete_image(ctx, repository, tag):
     versions = r.json()
     version_id = None
     for version in versions:
+        print (version)
         try:
             if tag in version['metadata']['container']['tags']:
                 version_id = (version['id'])
