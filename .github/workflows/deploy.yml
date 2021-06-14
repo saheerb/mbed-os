@@ -213,14 +213,20 @@ jobs:
           value=`cat mbed_os_version`
           echo "::set-output name=MBED_OS_VERSION::$value"
 
-      - 
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+
 
       - 
         name: Checkout
         uses: actions/checkout@v2
-            
+
+      - 
+        name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - 
         name: Find DOCKER DIGEST trying to publish (if exists in docker hub)
         id: docker_info_prod
@@ -237,14 +243,11 @@ jobs:
           echo "::set-output name=DIGEST::$DIGEST"
           echo "Docker DIGEST: $DIGEST"
 
-      - 
-        name: Login to DockerHub
-        uses: docker/login-action@v1 
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
+      - 
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+        
       # no need to test (nor publish) if we already have the same image in dockerhub
       - if: steps.docker_info_prod.outputs.DIGEST != steps.docker_info_dev.outputs.DIGEST
         name: test the container
