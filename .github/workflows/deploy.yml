@@ -29,6 +29,9 @@ on:
     
   push:
     branches: [ master, mbed-os-env ]
+    paths:
+      - docker_images/mbed-os-env
+      - .github/workflows
 
 
   workflow_dispatch:
@@ -57,7 +60,6 @@ jobs:
 
   prepare-tags:
     runs-on: ubuntu-latest
-
 
     steps:
       -
@@ -301,8 +303,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
           options: -v ${{ github.workspace }}:/work -w=/work
-
-          # image: ghcr.io/${{ github.actor }}/mbed-os-env-tmp@${{ steps.docker_info_dev.outputs.DIGEST }}
           image: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
           shell: bash
           run: |
