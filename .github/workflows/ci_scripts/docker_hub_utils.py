@@ -26,9 +26,7 @@ def _get_jwt(username, password):
 @click.option("-t", "--tag", required=True)
 @click.option("-p", "--platform", required=False)
 def get_digest(ctx, repository, tag, platform=None):
-    print ("dasdsa")
     command =  f"docker run quay.io/skopeo/stable --creds={ctx.obj['username']}:{ctx.obj['passwd']} inspect docker://ghcr.io/{ctx.obj['username']}/{repository}:{tag} --raw"
-    print (command)
     output = subprocess.run(command.split(), stdout=subprocess.PIPE).stdout.decode('utf-8')
     otuput = json.loads(output)
     # # print (j)
