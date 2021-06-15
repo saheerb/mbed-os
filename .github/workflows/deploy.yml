@@ -35,7 +35,7 @@ on:
 
     paths:
       - docker_images/mbed-os-env/**
-      - .github/workflows/**
+      - .github/workflows/deploy.yml
 
   workflow_dispatch:
 
