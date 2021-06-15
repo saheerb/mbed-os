@@ -6,6 +6,7 @@ import requests
 import json
 import logging
 import sys
+import subprocess
 
 
 def _get_jwt(username, password):
@@ -25,22 +26,27 @@ def _get_jwt(username, password):
 @click.option("-t", "--tag", required=True)
 @click.option("-p", "--platform", required=False)
 def get_digest(ctx, repository, tag, platform=None):
-    url = f"https://ghcr.io/v2/{ctx.obj['username']}/{repository}/manifests/{tag}"
-    # {tag}"
-    # url = f"https://registry.ghcr.io/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}/"
+    command =  f"docker run quay.io/skopeo/stable --creds={ctx.obj['username']}:{ctx.obj['passwd']} inspect docker://ghcr.io/{ctx.obj['username']}/{repository}:{tag} --raw"
+    output = subprocess.run(command.split(), stdout=subprocess.PIPE).stdout.decode('utf-8')
+    otuput = json.loads(output)
+    # # print (j)
+    
+    # # url = f"https://ghcr.io/v2/{ctx.obj['username']}/{repository}/manifests/{tag}"
+    # # {tag}"
+    # # url = f"https://registry.ghcr.io/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}/"
 
-    # url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}/"
+    # # url = f"https://registry.hub.docker.com/v2/repositories/{ctx.obj['username']}/{repository}/tags/{tag}/"
 
-    # print (url)
-    resp = requests.get(url, auth=(ctx.obj['username'], ctx.obj['passwd']))
+    # # print (url)
+    # # resp = requests.get(url, auth=(ctx.obj['username'], ctx.obj['passwd']))
 
-    if resp.status_code != 200:
-        print (resp)
-        logging.warning("Request failed, perhaps tag is not present")
-        sys.exit(0)
+    # if resp.status_code != 200:
+    #     print (resp)
+    #     logging.warning("Request failed, perhaps tag is not present")
+    #     sys.exit(0)
 
     # print (resp.json())
-    images = resp.json()["manifests"]
+    images = otuput["manifests"]
     digest = ""
     if len(images) > 1 and platform == None:
         logging.error(
