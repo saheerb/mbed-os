@@ -1,7 +1,7 @@
 name: Update released docker image (on main branch)
 on:
   schedule:
-    - cron:  '*/10 * * * *'
+    - cron:  '*/5 * * * *'
 
   # workflow_dispatch:
 

@@ -22,8 +22,8 @@ name: Publish new dev version of docker image
 #    This can be move with another workflow
 
 on:
-  schedule:
-    - cron:  '*/5 * * * *'
+  # schedule:
+  #   - cron:  '*/5 * * * *'
     
   push:
     # on push master build a new image master-latest for example application
