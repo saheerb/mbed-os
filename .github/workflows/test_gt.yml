@@ -1,0 +1,23 @@
+name: Build and test image when PR is raised
+
+on:
+  push:
+    branches: [ master ]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - 
+        name: mbed build
+        uses: addnab/docker-run-action@v3
+        with:
+          options: -v ${{ github.workspace }}:/work -w=/work
+          image: mbed-os-env:latest
+          shell: bash
+          run: |
+            mbed test -m NUCLEO_L552ZE_Q_NPSA -t GCC_ARM --compile
