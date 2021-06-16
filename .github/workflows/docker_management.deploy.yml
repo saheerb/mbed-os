@@ -1,4 +1,4 @@
-name: Publish new dev version of docker image 
+name: Publish new dev version of docker image (main)
 
 # The workflow is split into several sub jobs
 # 1. prepare-tags: 
@@ -22,8 +22,8 @@ name: Publish new dev version of docker image
 #    This can be move with another workflow
 
 on:
-  # schedule:
-  #   - cron:  '*/5 * * * *'
+  schedule:
+    - cron:  '15 4 * * *'
     
     
   push:
@@ -50,6 +50,11 @@ jobs:
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
+
+      - 
+        name: Testing branch
+        shell: bash
+        run: echo "I am on master"
 
       -
         name: Checkout

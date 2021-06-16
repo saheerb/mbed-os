@@ -1,20 +1,19 @@
+# use this workflow for updating a released production docker image
 name: Update released docker image (on main branch)
 on:
   schedule:
     - cron:  '*/5 * * * *'
-
-  # workflow_dispatch:
 
 jobs:
   prepare-tags:
     runs-on: ubuntu-latest
 
     steps:
-      - 
-        name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
+      # - 
+      #   name: Extract branch name
+      #   shell: bash
+      #   run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      #   id: extract_branch
 
       -
         name: Checkout

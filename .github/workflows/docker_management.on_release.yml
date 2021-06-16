@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - 
-        name: Extract branch name
+        name: Extract tag name
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/tags/})"
         id: extract_branch
