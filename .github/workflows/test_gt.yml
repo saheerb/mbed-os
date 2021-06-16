@@ -20,4 +20,4 @@ jobs:
           image: mbedos/mbed-os-env:latest
           shell: bash
           run: |
-            mbed test -m NUCLEO_L552ZE_Q_NPSA -t GCC_ARM --compile
+            mbed test -m NUCLEO_F767ZI -t GCC_ARM --compile
