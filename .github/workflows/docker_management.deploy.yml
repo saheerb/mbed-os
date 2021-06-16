@@ -27,12 +27,9 @@ on:
     
     
   push:
-    # on push master build a new image master-latest for example application
-    # on push 5.15 build a new image 5.15-latest for example application
-    # on release 5.15 build a new image 5.15-stable for example application
-    # on manul 
-    # at night ??
-    branches: [ master ]
+    branches: 
+      - master
+      - mbed-os-5.15
 
     paths:
       - docker_images/mbed-os-env/**
@@ -62,14 +59,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - 
-        name: Find the latest tag on the branch
-        id: mbed_os_version
-        shell: bash
-        run: |
-          value=`git describe --tags --abbrev=0  --match mbed-os-*.[0-9]`
-          echo "TAG is $value"
-          echo "::set-output name=tag::$value"
+      # - 
+      #   name: Find the latest tag on the branch
+      #   id: mbed_os_version
+      #   shell: bash
+      #   run: |
+      #     value=`git describe --tags --abbrev=0  --match mbed-os-*.[0-9]`
+      #     echo "TAG is $value"
+      #     echo "::set-output name=tag::$value"
 
       - 
         name: Set UUID
@@ -125,13 +122,14 @@ jobs:
         id: build_info
         run: |
           value=`cat dev_tag`
-          echo "TAG is $value"
+          echo "DEV TAG is $value"
           echo "::set-output name=DOCKER_DEV_TAG::$value"
           value=`cat prod_tag_dated`
-          echo "TAG is $value"
+          echo "PROD TAG DATED is $value"
           echo "::set-output name=DOCKER_PROD_TAG_DATED::$value"
           value=`cat prod_tag_latest`
           echo "::set-output name=DOCKER_PROD_TAG_LATEST::$value"
+          echo "PROD TAG is $value"
 
       - 
         name: Set up Docker Buildx
