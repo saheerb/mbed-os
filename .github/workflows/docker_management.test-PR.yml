@@ -2,7 +2,7 @@ name: Build and test image when PR is raised (on LTS branch)
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ maste1r ]
     paths:
       - docker_images/mbed-os-env/**
       - .github/workflows/docker_management.*
