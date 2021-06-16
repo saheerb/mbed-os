@@ -1,4 +1,4 @@
-name: publish image to docker hub
+name: Release new dev version of docker image
 
 # The workflow is split into several sub jobs
 # 1. prepare-tags: 
