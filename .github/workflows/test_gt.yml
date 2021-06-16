@@ -1,4 +1,4 @@
-name: Build and test image when PR is raised
+name: Build and test mbed example
 
 on:
   push:
