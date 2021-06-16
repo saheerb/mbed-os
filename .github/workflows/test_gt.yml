@@ -17,7 +17,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           options: -v ${{ github.workspace }}:/work -w=/work
-          image: mbed-os-env:latest
+          image: mbedos/mbed-os-env:latest
           shell: bash
           run: |
             mbed test -m NUCLEO_L552ZE_Q_NPSA -t GCC_ARM --compile
