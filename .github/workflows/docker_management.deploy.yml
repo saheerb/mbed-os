@@ -25,6 +25,7 @@ on:
   # schedule:
   #   - cron:  '*/5 * * * *'
     
+    
   push:
     # on push master build a new image master-latest for example application
     # on push 5.15 build a new image 5.15-latest for example application
