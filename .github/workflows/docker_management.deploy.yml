@@ -21,10 +21,6 @@ name: Publish new dev version of docker image
 #    This can be move with another workflow
 
 on:
-  schedule:
-    - cron:  '15 4 * * *'
-    
-    
   push:
     branches: 
       - master

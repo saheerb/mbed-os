@@ -2,7 +2,7 @@ name: Build and test image when PR is raised
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ master, mbed-os-5.15 ]
     paths:
       - docker_images/mbed-os-env/**
       - .github/workflows/docker_management.*
