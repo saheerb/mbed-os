@@ -32,7 +32,7 @@ on:
     # on release 5.15 build a new image 5.15-stable for example application
     # on manul 
     # at night ??
-    branches: [ master, lts, mbed-os-env ]
+    branches: [ master ]
 
     paths:
       - docker_images/mbed-os-env/**
