@@ -1,4 +1,4 @@
-name: A new mbed-os is released on main branch 
+name: Release new docker image when new mbed-os is released (on LTS branch)
 
 # The workflow is split into several sub jobs
 # 1. prepare-tags: 

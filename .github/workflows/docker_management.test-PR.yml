@@ -1,4 +1,4 @@
-name: build and test image
+name: Build and test image when PR is raised (on LTS branch)
 
 on:
   pull_request:
