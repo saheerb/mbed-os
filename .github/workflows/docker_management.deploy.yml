@@ -1,4 +1,4 @@
-name: Release new dev version (compatible with main branch) of docker image 
+name: Publish new dev version (compatible with main branch) of docker image 
 
 # The workflow is split into several sub jobs
 # 1. prepare-tags: 
