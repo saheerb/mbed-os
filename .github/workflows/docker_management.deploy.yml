@@ -1,10 +1,43 @@
 name: publish image to docker hub
 
+# The workflow is split into several sub jobs
+# 1. prepare-tags: 
+#    This step finds the latest mbed-os version (in terms of product version not date)
+#    and generates a unique dev version for the image. 
+#    The DEV docker tag takes the format of dev-<MBED_OS_VERSION>-<human readable date>-<UUID>
+# 2. build-container:
+#    The dev version of image is built here and pushed to docker hub.
+#    When multiarch image is built docker buildx doesn't support exporting to docker
+#    Hence, need to push to a registry (dockerhub).
+# 3. test-container:
+#    This tests the dev docker images
+# 4. deploy-container
+#    At this point, docker image marked as "dev" is ready to tag as "prod"
+#    Also, deletes the dev tag
+#    The dev images that didn't succeed is kept in docker hub for troubleshooting purposes.
+#    Published docker tags are:
+#    1. <MBED_OS_VERSION>-latest
+#    2. <MBED_OS_VERSION>-<human readable date>
+#    3. latest
+#    This can be move with another workflow
+
 on:
   schedule:
-    - cron:  '*/10 * * * *'
+    - cron:  '15 4 * * *'
+    
+  push:
+    # on push master build a new image master-latest for example application
+    # on push 5.15 build a new image 5.15-latest for example application
+    # on release 5.15 build a new image 5.15-stable for example application
+    # on manul 
+    # at night ??
+    branches: [ master, lts, mbed-os-env ]
 
-  # workflow_dispatch:
+    paths:
+      - docker_images/mbed-os-env/**
+      - .github/workflows/docker_management.deploy.yml
+
+  workflow_dispatch:
 
 jobs:
   prepare-tags:
@@ -21,7 +54,6 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: master
           fetch-depth: 0
 
       - 
@@ -48,14 +80,14 @@ jobs:
         run: |
           mkdir -p build_info
           date=$(date +"%Y.%m.%dT%H.%M.%S")
-          # echo dev-${{ steps.extract_branch.outputs.branch }}-${date}-${{ steps.generate-uuid.outputs.uuid }} > build_info/dev_tag
-          # echo ${{ steps.extract_branch.outputs.branch }}-${date} > build_info/prod_tag_dated
-          # echo ${{ steps.extract_branch.outputs.branch }}-latest > build_info/prod_tag_latest
-          # echo ${{ steps.extract_branch.outputs.branch }} > build_info/mbed_os_version
-          echo dev-${{ steps.mbed_os_version.outputs.tag }}-${date}-${{ steps.generate-uuid.outputs.uuid }} > build_info/dev_tag
-          echo ${{ steps.mbed_os_version.outputs.tag }}-${date} > build_info/prod_tag_dated
-          echo ${{ steps.mbed_os_version.outputs.tag }}-latest > build_info/prod_tag_latest
-          echo ${{ steps.mbed_os_version.outputs.tag }} > build_info/mbed_os_version
+          echo dev-${{ steps.extract_branch.outputs.branch }}-${date}-${{ steps.generate-uuid.outputs.uuid }} > build_info/dev_tag
+          echo ${{ steps.extract_branch.outputs.branch }}-${date} > build_info/prod_tag_dated
+          echo ${{ steps.extract_branch.outputs.branch }}-latest > build_info/prod_tag_latest
+          echo ${{ steps.extract_branch.outputs.branch }} > build_info/mbed_os_version
+          # echo dev-${{ steps.mbed_os_version.outputs.tag }}-${date}-${{ steps.generate-uuid.outputs.uuid }} > build_info/dev_tag
+          # echo ${{ steps.mbed_os_version.outputs.tag }}-${date} > build_info/prod_tag_dated
+          # echo ${{ steps.mbed_os_version.outputs.tag }}-latest > build_info/prod_tag_latest
+          # echo ${{ steps.mbed_os_version.outputs.tag }} > build_info/mbed_os_version
 
       # archiving and unarchiving are github actions ways to pass variables between jobs    
       - 
@@ -65,6 +97,7 @@ jobs:
           name: build-info
           path: build_info
           
+
 
   build-container:
     runs-on: ubuntu-latest
@@ -93,8 +126,6 @@ jobs:
           echo "::set-output name=DOCKER_PROD_TAG_DATED::$value"
           value=`cat prod_tag_latest`
           echo "::set-output name=DOCKER_PROD_TAG_LATEST::$value"
-          value=`cat mbed_os_version`
-          echo "::set-output name=MBED_OS_VERSION::$value"
 
       - 
         name: Set up Docker Buildx
@@ -115,8 +146,6 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v2
-        with:
-          ref: ${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
       -
         name: Build with remote cache
@@ -187,8 +216,6 @@ jobs:
       - 
         name: Checkout
         uses: actions/checkout@v2
-        with:
-          ref: ${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
       - 
         name: Set up QEMU
@@ -259,5 +286,5 @@ jobs:
       - 
         name: Delete Dev image
         run: |
-          python ./.github/workflows/docker_management/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.ANOTHER_GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
-          # python ./.github/workflows/docker_management/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+          python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.ANOTHER_GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+          # python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
