@@ -42,7 +42,7 @@ jobs:
           file: ./mbed-os-env/Dockerfile
           load: true
           tags: mbed-os-env:a_pr_test
-          cache-from: type=registry,ref=mbedos/mbed-os-env:latest
+          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/mbed-os-env:mbed-os-5.15-latest
 
       - 
         name: test the container
