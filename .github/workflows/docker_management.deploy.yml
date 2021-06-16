@@ -1,5 +1,4 @@
-name: Publish new dev version of docker image (main)
-
+name: Publish new dev version of docker image
 # The workflow is split into several sub jobs
 # 1. prepare-tags: 
 #    This step finds the latest mbed-os version (in terms of product version not date)
