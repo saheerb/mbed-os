@@ -1,4 +1,4 @@
-name: Periodically update last released docker image (on LTS branch)
+name: Update released docker image (on LTS branch)
 
 on:
   schedule:

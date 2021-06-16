@@ -1,4 +1,4 @@
-name: Build and test image when PR is raised (on main branch)
+name: Build and test image when PR is raised
 
 on:
   pull_request:
