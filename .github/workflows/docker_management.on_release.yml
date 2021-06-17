@@ -130,9 +130,9 @@ jobs:
           value=`cat mbed_os_version`
           echo "::set-output name=MBED_OS_VERSION::$value"
           if [ "workflow_dispatch" == "${{github.event_name}}" ];then
-            echo "##[set-output name=CACHE_SOURCE;]$(echo ${GITHUB_REF#refs/heads/})"
-          else
             echo "##[set-output name=CACHE_SOURCE;]$(echo ${value})"
+          else
+            echo "##[set-output name=CACHE_SOURCE;]$(echo ${GITHUB_REF#refs/heads/})"
           fi
 
       - 
