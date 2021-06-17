@@ -100,7 +100,7 @@ jobs:
         run: |
           value=`cat dev_tag`
           echo "TAG is $value"
-          echo "::set-output name=DOCKER_DEV_TAG::$value"
+          echo "::set-output name=DOCKER_DEV_TAG::$value_tag"
           value=`cat prod_tag_dated`
           echo "TAG is $value"
           echo "::set-output name=DOCKER_PROD_TAG_DATED::$value"
@@ -188,7 +188,7 @@ jobs:
         run: |
           value=`cat dev_tag`
           echo "TAG is $value"
-          echo "::set-output name=DOCKER_DEV_TAG::$value"
+          echo "::set-output name=DOCKER_DEV_TAG::$value_tag"
           value=`cat prod_tag_dated`
           echo "TAG is $value"
           echo "::set-output name=DOCKER_PROD_TAG_DATED::$value"
@@ -257,7 +257,7 @@ jobs:
         run: |
           value=`cat dev_tag`
           echo "TAG is $value"
-          echo "::set-output name=DOCKER_DEV_TAG::$value"
+          echo "::set-output name=DOCKER_DEV_TAG::$value_tag"
           value=`cat prod_tag_dated`
           echo "TAG is $value"
           echo "::set-output name=DOCKER_PROD_TAG_DATED::$value"

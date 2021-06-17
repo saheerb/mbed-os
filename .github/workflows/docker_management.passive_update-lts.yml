@@ -1,5 +1,5 @@
 # use this workflow for updating a released production docker image
-name: Update released docker image (on mbed-os-5.15 branch)
+name: Update released docker image (on main branch)
 on:
   schedule:
     - cron:  '15 4 * * *'
@@ -13,7 +13,7 @@ jobs:
         name: Extract branch name
         shell: bash
         run: |
-          echo "::set-output name=branch::mbed-os-5.15"
+          echo "::set-output name=branch::master"
         id: extract_branch
 
       -
@@ -100,7 +100,7 @@ jobs:
         run: |
           value=`cat dev_tag`
           echo "TAG is $value"
-          echo "::set-output name=DOCKER_DEV_TAG::$value"
+          echo "::set-output name=DOCKER_DEV_TAG::$value_tag"
           value=`cat prod_tag_dated`
           echo "TAG is $value"
           echo "::set-output name=DOCKER_PROD_TAG_DATED::$value"
@@ -188,7 +188,7 @@ jobs:
         run: |
           value=`cat dev_tag`
           echo "TAG is $value"
-          echo "::set-output name=DOCKER_DEV_TAG::$value"
+          echo "::set-output name=DOCKER_DEV_TAG::$value_tag"
           value=`cat prod_tag_dated`
           echo "TAG is $value"
           echo "::set-output name=DOCKER_PROD_TAG_DATED::$value"
@@ -257,7 +257,7 @@ jobs:
         run: |
           value=`cat dev_tag`
           echo "TAG is $value"
-          echo "::set-output name=DOCKER_DEV_TAG::$value"
+          echo "::set-output name=DOCKER_DEV_TAG::$value_tag"
           value=`cat prod_tag_dated`
           echo "TAG is $value"
           echo "::set-output name=DOCKER_PROD_TAG_DATED::$value"
