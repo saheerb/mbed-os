@@ -8,6 +8,7 @@ on:
 
     paths:
       # what about dependencies?
+      # what about forks?
       - docker_images/mbed-os-env/**
       - .github/workflows/docker_management.deploy.yml
 
