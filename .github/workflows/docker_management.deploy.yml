@@ -7,8 +7,10 @@ on:
       - mbed-os-5.15
 
     paths:
+      # what about dependencies?
       - docker_images/mbed-os-env/**
       - .github/workflows/docker_management.deploy.yml
+
 
   workflow_dispatch: 
 
