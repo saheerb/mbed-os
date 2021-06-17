@@ -31,7 +31,7 @@ on:
   workflow_dispatch:
     inputs:
       mbed_os_release_version:
-        description: 'Input mbed-os release version for which you want to create docker image.'
+        description: 'mbed-os release version for which you want to create docker image.'
         required: true
 
 jobs:
@@ -42,13 +42,16 @@ jobs:
       - 
         name: Extract tag name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/tags/})"
+        run: | 
+          echo "Log level: ${{ github.event.inputs.mbed_os_release_version }}"
+          echo "##[set-output name=tag;]$(echo ${GITHUB_REF#refs/tags/})"
         id: extract_tag
 
       -
         name: Checkout
         uses: actions/checkout@v2
         with:
+          ref: ${{ steps.extract_tag.outputs.tag }}
           fetch-depth: 0
 
       # - 
@@ -75,10 +78,10 @@ jobs:
         run: |
           mkdir -p build_info
           date=$(date +"%Y.%m.%dT%H.%M.%S")
-          echo dev-${{ steps.extract_tag.outputs.branch }}-${date}-${{ steps.generate-uuid.outputs.uuid }} > build_info/dev_tag
-          echo ${{ steps.extract_tag.outputs.branch }}-${date} > build_info/prod_tag_dated
-          echo ${{ steps.extract_tag.outputs.branch }}-latest > build_info/prod_tag_latest
-          echo ${{ steps.extract_tag.outputs.branch }} > build_info/mbed_os_version
+          echo dev-${{ steps.extract_tag.outputs.tag }}-${date}-${{ steps.generate-uuid.outputs.uuid }} > build_info/dev_tag
+          echo ${{ steps.extract_tag.outputs.tag }}-${date} > build_info/prod_tag_dated
+          echo ${{ steps.extract_tag.outputs.tag }}-latest > build_info/prod_tag_latest
+          echo ${{ steps.extract_tag.outputs.tag }} > build_info/mbed_os_version
           # echo dev-${{ steps.mbed_os_version.outputs.tag }}-${date}-${{ steps.generate-uuid.outputs.uuid }} > build_info/dev_tag
           # echo ${{ steps.mbed_os_version.outputs.tag }}-${date} > build_info/prod_tag_dated
           # echo ${{ steps.mbed_os_version.outputs.tag }}-latest > build_info/prod_tag_latest
