@@ -2,7 +2,7 @@
 name: Update released docker image (on main branch)
 on:
   schedule:
-    - cron:  '15 4 * * *'
+    - cron:  '*/5 * * * *'
 
 jobs:
   prepare-tags:
