@@ -93,9 +93,8 @@ jobs:
             echo ${value}
             echo ${value} > build_info/cache_source
           else
-            echo ${GITHUB_REF}
-            git branch --contains ${GITHUB_REF}
-            value=$(git branch --contains ${GITHUB_REF} |cut -d' ' -f2)
+            # TODO: Find method to find the branch properly
+            value="master"
             echo ${value}
             echo ${value} > build_info/cache_source
             
