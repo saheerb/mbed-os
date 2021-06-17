@@ -39,7 +39,7 @@ jobs:
         with:
           context: .
           platforms: ${{ matrix.platform }}
-          file: ./mbed-os-env/Dockerfile
+          file: ./docker_images/mbed-os-env/Dockerfile
           load: true
           tags: mbed-os-env:a_pr_test
           cache-from: type=registry,ref=mbedos/mbed-os-env:master-latest
@@ -54,6 +54,5 @@ jobs:
           shell: bash
           run: |
             set -e
-            echo "::set-output name=STATUS::failed"
             uname -m
-            ./mbed-os-env/test.sh 
+            ./docker_images/mbed-os-env/test.sh 
