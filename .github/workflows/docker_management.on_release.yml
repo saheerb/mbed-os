@@ -55,6 +55,7 @@ jobs:
         run: | 
           echo "Input tag: ${{ github.event.inputs.mbed_os_release_version }}"
           echo "${GITHUB_REF}"
+          echo "${github.event_name}"
           if [ -z ${{ github.event.inputs.mbed_os_release_version }} ];then
             echo "##[set-output name=tag;]$(echo ${GITHUB_REF#refs/tags/})"
             echo "##[set-output name=cache_source;]$(echo ${GITHUB_REF#refs/tags/})"
