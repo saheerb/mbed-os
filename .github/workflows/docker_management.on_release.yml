@@ -49,7 +49,7 @@ jobs:
         name: Extract tag name
         shell: bash
         run: | 
-          echo "Log level: ${{ github.event.inputs.mbed_os_release_version }}"
+          echo "Input tag: ${{ github.event.inputs.mbed_os_release_version }}"
           echo "${GITHUB_REF}"
           if [ -z ${{ github.event.inputs.mbed_os_release_version }} ];then
             echo "##[set-output name=tag;]$(echo ${GITHUB_REF#refs/tags/})"
@@ -58,25 +58,9 @@ jobs:
               echo "Check the tag name ${{ github.event.inputs.mbed_os_release_version }} is not found on branch ${GITHUB_REF}"
               exit 1
             fi
-            echo "::set-output name=tag::refs/tag/${{ github.event.inputs.mbed_os_release_version }}"
+            echo "::set-output name=tag::${{ github.event.inputs.mbed_os_release_version }}"
           fi
         id: extract_tag
-
-      # -
-      #   name: Checkout
-      #   uses: actions/checkout@v2
-      #   with:
-      #     ref: ${{ steps.extract_tag.outputs.tag }}
-      #     fetch-depth: 0
-
-      # - 
-      #   name: Find the latest tag on the branch
-      #   id: mbed_os_version
-      #   shell: bash
-      #   run: |
-      #     value=`git describe --tags --abbrev=0  --match mbed-os-*.[0-9]`
-      #     echo "TAG is $value"
-      #     echo "::set-output name=tag::$value"
 
       - 
         name: Set UUID
@@ -160,6 +144,8 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v2
+        with:
+          refs/tag/${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
       -
         name: Build with remote cache
@@ -230,6 +216,8 @@ jobs:
       - 
         name: Checkout
         uses: actions/checkout@v2
+        with:
+          ref: refs/tag/${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
       - 
         name: Set up QEMU
@@ -271,6 +259,8 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v2
+        with:
+          refs/tag/${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
       - 
         name: unarchive artefacts
