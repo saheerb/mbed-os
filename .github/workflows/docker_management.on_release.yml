@@ -39,6 +39,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       - 
         name: Extract tag name
         shell: bash
@@ -56,12 +62,12 @@ jobs:
           fi
         id: extract_tag
 
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ steps.extract_tag.outputs.tag }}
-          fetch-depth: 0
+      # -
+      #   name: Checkout
+      #   uses: actions/checkout@v2
+      #   with:
+      #     ref: ${{ steps.extract_tag.outputs.tag }}
+      #     fetch-depth: 0
 
       # - 
       #   name: Find the latest tag on the branch
