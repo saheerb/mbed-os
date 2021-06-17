@@ -1,4 +1,4 @@
-name: Release new docker image when new mbed-os is released
+name: Release docker image for an mbed-os release version
 
 # The workflow is split into several sub jobs
 # 1. prepare-tags: 
@@ -278,7 +278,7 @@ jobs:
           echo "::set-output name=DOCKER_PROD_TAG_LATEST::$value"
           value=`cat mbed_os_version`
           echo "::set-output name=MBED_OS_VERSION::$value"
-          
+
       -
         name: Checkout
         uses: actions/checkout@v2
