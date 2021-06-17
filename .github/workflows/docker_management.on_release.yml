@@ -28,6 +28,12 @@ on:
       - mbed-os-6.[0-9]+.[0-9]+
       - mbed-os-5.[0-9]+.[0-9]+
 
+  workflow_dispatch:
+    inputs:
+      mbed_os_release_version:
+        description: 'Input mbed-os release version for which you want to create docker image.'
+        required: true
+
 jobs:
   prepare-tags:
     runs-on: ubuntu-latest
