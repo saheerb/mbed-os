@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: | 
           echo "Log level: ${{ github.event.inputs.mbed_os_release_version }}"
-          echo "${GITHUB_REF"
+          echo "${GITHUB_REF}"
           echo "##[set-output name=tag;]$(echo ${GITHUB_REF#refs/tags/})"
         id: extract_tag
 
