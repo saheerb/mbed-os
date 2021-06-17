@@ -90,11 +90,11 @@ jobs:
           # if workflow is executed because of a new tag; cache is taken from head of the branch
           if [ "workflow_dispatch" == "${{github.event_name}}" ];then
             value=${{ github.event.inputs.mbed_os_release_version }}
-            echo $value
+            echo ${{ value }}
             echo ${{ value }} > build_info/cache_source
           else
             value=`git branch --contains ${GITHUB_REF} |cut -d' ' -f2`
-            echo $value
+            echo ${{ value }}
             echo ${{ value }} > build_info/cache_source
             
           fi
