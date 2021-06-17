@@ -145,7 +145,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
         with:
-          refs/tag/${{ steps.build_info.outputs.MBED_OS_VERSION }}
+          refs/tags/${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
       -
         name: Build with remote cache
@@ -217,7 +217,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
         with:
-          ref: refs/tag/${{ steps.build_info.outputs.MBED_OS_VERSION }}
+          ref: refs/tags/${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
       - 
         name: Set up QEMU
@@ -260,7 +260,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
         with:
-          refs/tag/${{ steps.build_info.outputs.MBED_OS_VERSION }}
+          refs/tags/${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
       - 
         name: unarchive artefacts
