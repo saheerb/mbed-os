@@ -1,5 +1,5 @@
 # use this workflow for updating a released production docker image
-name: Auto update released docker image (on lts branch)
+name: Auto update released docker image (on main branch)
 on:
   schedule:
     - cron:  '*/10 * * * *'
