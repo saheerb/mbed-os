@@ -48,6 +48,10 @@ jobs:
           if [ -z ${{ github.event.inputs.mbed_os_release_version }} ];then
             echo "##[set-output name=tag;]$(echo ${GITHUB_REF#refs/tags/})"
           else
+            if [ -z $(git tag --merged ${GITHUB_REF} ${{ github.event.inputs.mbed_os_release_version }}) ]; then
+              echo "Check the tag name ${{ github.event.inputs.mbed_os_release_version }} is not found on branch ${GITHUB_REF}"
+              exit 1
+            fi
             echo "::set-output name=tag::refs/tag/${{ github.event.inputs.mbed_os_release_version }}"
           fi
         id: extract_tag
