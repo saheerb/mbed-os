@@ -1,4 +1,4 @@
-name: Release docker image for an mbed-os release version
+name: Release or manual update a released version
 
 # The workflow is split into several sub jobs
 # 1. prepare-tags: 
@@ -21,6 +21,10 @@ name: Release docker image for an mbed-os release version
 #    3. latest
 #    This can be move with another workflow
 
+
+# TODO: Handle cache when new build is made. Currently when mbed-os-6.11.15 is made cache is also set to mbed-os-6.11.15
+# this is slow and creates a new image. Need to set to master-latest when new tag is created and to mbed-os-6.11.15
+# when tag already exists
 # cannot combine with on push on branch as on tags needs to be executed without path exclusion
 on:    
   push:
