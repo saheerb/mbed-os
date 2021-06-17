@@ -50,7 +50,6 @@ jobs:
           else
             echo "::set-output name=tag::${{ github.event.inputs.mbed_os_release_version }}"
           fi
-          echo "##[set-output name=tag;]$(echo ${GITHUB_REF#refs/tags/})"
         id: extract_tag
 
       -
