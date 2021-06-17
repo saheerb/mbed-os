@@ -86,6 +86,17 @@ jobs:
           echo ${{ steps.extract_tag.outputs.tag }}-${date} > build_info/prod_tag_dated
           echo ${{ steps.extract_tag.outputs.tag }}-latest > build_info/prod_tag_latest
           echo ${{ steps.extract_tag.outputs.tag }} > build_info/mbed_os_version
+          # if workflow is executed manually; then take cache from the tagged version
+          # if workflow is executed because of a new tag; cache is taken from head of the branch
+          if [ "workflow_dispatch" == "${{github.event_name}}" ];then
+            value=${{ github.event.inputs.mbed_os_release_version }}
+            echo ${ value } > build_info/cache_source
+            echo $value
+          else
+            value=`git branch --contains ${GITHUB_REF} |cut -d' ' -f2`
+            echo ${ value } > build_info/cache_source
+            echo $value
+          fi
           # echo dev-${{ steps.mbed_os_version.outputs.tag }}-${date}-${{ steps.generate-uuid.outputs.uuid }} > build_info/dev_tag
           # echo ${{ steps.mbed_os_version.outputs.tag }}-${date} > build_info/prod_tag_dated
           # echo ${{ steps.mbed_os_version.outputs.tag }}-latest > build_info/prod_tag_latest
@@ -129,17 +140,9 @@ jobs:
           echo "::set-output name=DOCKER_PROD_TAG_LATEST::$value"
           value=`cat mbed_os_version`
           echo "::set-output name=MBED_OS_VERSION::$value"
-          # if workflow is executed manually; then take cache from the tagged version
-          # if workflow is executed because of a new tag; cache is taken from head of the branch
-          if [ "workflow_dispatch" == "${{github.event_name}}" ];then
-            value=${{ github.event.inputs.mbed_os_release_version }}
-            echo "##[set-output name=CACHE_SOURCE;]$(echo ${value})"
-            echo $value
-          else
-            value=`git branch --contains ${GITHUB_REF} |cut -d' ' -f2`
-            echo "##[set-output name=CACHE_SOURCE;]$(echo ${value})"
-            echo $value
-          fi
+          value=`cat cache_source`
+          echo "::set-output name=CACHE_SOURCE::$value"
+
 
       - 
         name: Set up Docker Buildx
