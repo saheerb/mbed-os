@@ -93,6 +93,8 @@ jobs:
             echo ${value}
             echo ${value} > build_info/cache_source
           else
+            ${GITHUB_REF}
+            git branch --contains ${GITHUB_REF}
             value=$(git branch --contains ${GITHUB_REF} |cut -d' ' -f2)
             echo ${value}
             echo ${value} > build_info/cache_source
