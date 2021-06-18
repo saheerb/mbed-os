@@ -291,10 +291,11 @@ jobs:
 
       # even if tests skipped (as cache was used as source retag)
       - 
-        if: needs.test-container.result=='skipped' || needs.test-container.outputs.STATUS == 'passed'
+        if: needs.test-container.result=='skipped1' || needs.test-container.outputs.STATUS == 'passed'
         name: copy dev tag to prod
         run: |
           set -x
+          echo ${{ needs.test-container.result }}
           upto_patch_version=${{ steps.build_info.outputs.MBED_OS_VERSION }}-latest
           upto_min_version=${upto_patch_version%.[0-9]*}-latest
           upto_major_version=${upto_patch_version%.[0-9]*.[0-9]*}-latest
@@ -305,7 +306,7 @@ jobs:
 
       - 
         if: needs.test-container.outputs.STATUS == 'passed'
-        name: copy dev tag to prod
+        name: copy dev tag to prod dated tag
         run: |
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_DATED }}
 
