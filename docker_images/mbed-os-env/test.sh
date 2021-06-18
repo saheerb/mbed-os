@@ -8,7 +8,6 @@ else
     EXAMPLE_VERSION=${MBED_OS_VERSION}
 fi
 
-exit
 mbed import mbed-os-example-blinky
 cd mbed-os-example-blinky
 git checkout ${EXAMPLE_VERSION}
