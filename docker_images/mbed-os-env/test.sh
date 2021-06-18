@@ -1,17 +1,17 @@
 #!/bin/sh
 set -x
 MBED_OS_VERSION=$1
-# if master; then
-# EXAMPL_VERSION="development"
-# else
-# # if tagged if tag is available us it
-# # if tag is not available? use development
-# fi
+set -x
+
+if [ MBED_OS_VERSION == "master" ];then
+    EXAMPLE_VERSION="development"
+else
+    EXAMPLE_VERSION=${MBED_OS_VERSION}
+fi
 
 mbed import mbed-os-example-blinky
 cd mbed-os-example-blinky
-git checkout ${MBED_OS_VERSION}
+git checkout ${EXAMPLE_VERSION}
 mbed deploy 
-# symlink
 mbed compile -m K64F -t GCC_ARM
 mbed-tools compile -m K64F -t GCC_ARM
