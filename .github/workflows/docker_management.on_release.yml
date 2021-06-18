@@ -32,10 +32,13 @@ on:
       - mbed-os-6.[0-9]+.[0-9]+
       - mbed-os-5.[0-9]+.[0-9]+
 
+  schedule:
+    - cron:  '*/15 * * * *'
+
   workflow_dispatch:
     inputs:
       mbed_os_release_version:
-        description: 'mbed-os release version for which you want to create docker image.'
+        description: 'mbed-os release version for which you want to update docker image.'
         required: true
 
 jobs:
@@ -50,22 +53,14 @@ jobs:
           fetch-depth: 0
 
       - 
-        name: Extract tag name
+        name: Sanity check tag of manual trigger
         shell: bash
+        if: "workflow_dispatch" == "${{github.event_name}}"
         run: | 
-          echo "Input tag: ${{ github.event.inputs.mbed_os_release_version }}"
-          echo "${GITHUB_REF}"
-          echo "${{github.event_name}}"
-          if [ -z ${{ github.event.inputs.mbed_os_release_version }} ];then
-            echo "##[set-output name=tag;]$(echo ${GITHUB_REF#refs/tags/})"
-          else
-            if [ -z $(git tag --merged ${GITHUB_REF} ${{ github.event.inputs.mbed_os_release_version }}) ]; then
-              echo "Check the tag name ${{ github.event.inputs.mbed_os_release_version }} is not found on branch ${GITHUB_REF}"
-              exit 1
-            fi
-            echo "::set-output name=tag::${{ github.event.inputs.mbed_os_release_version }}"
+          if [ -z $(git tag --merged ${GITHUB_REF} ${{ github.event.inputs.mbed_os_release_version }}) ]; then
+            echo "Check the tag name ${{ github.event.inputs.mbed_os_release_version }} is not found on branch ${GITHUB_REF}"
+            exit 1
           fi
-        id: extract_tag
 
       - 
         name: Set UUID
@@ -82,27 +77,21 @@ jobs:
         run: |
           mkdir -p build_info
           date=$(date +"%Y.%m.%dT%H.%M.%S")
-          echo dev-${{ steps.extract_tag.outputs.tag }}-${date}-${{ steps.generate-uuid.outputs.uuid }} > build_info/dev_tag
-          echo ${{ steps.extract_tag.outputs.tag }}-${date} > build_info/prod_tag_dated
-          echo ${{ steps.extract_tag.outputs.tag }}-latest > build_info/prod_tag_latest
-          echo ${{ steps.extract_tag.outputs.tag }} > build_info/mbed_os_version
-          # if workflow is executed manually; then take cache from the tagged version
-          # if workflow is executed because of a new tag; cache is taken from head of the branch
-          if [ "workflow_dispatch" == "${{github.event_name}}" ];then
-            value="${{ github.event.inputs.mbed_os_release_version }}"
-            echo ${value}
-            echo ${value} > build_info/cache_source
-          else
+          if [ "on" == "${{github.event_name}}" ];then
+            version=${GITHUB_REF#refs/tags/}
             # TODO: Find method to find the branch properly
-            value="master"
-            echo ${value}
-            echo ${value} > build_info/cache_source
-            
+            cache_source="master"
+          elif [ "workflow_dispatch" == "${{github.event_name}}" ];then
+            version=${{ github.event.inputs.mbed_os_release_version }}
+            cache_source=${version}
+          else
+            version=`git describe --tags --abbrev=0  --match mbed-os-[0-9].[0-9].[0-9]`
+            cache_source=${version}
           fi
-          # echo dev-${{ steps.mbed_os_version.outputs.tag }}-${date}-${{ steps.generate-uuid.outputs.uuid }} > build_info/dev_tag
-          # echo ${{ steps.mbed_os_version.outputs.tag }}-${date} > build_info/prod_tag_dated
-          # echo ${{ steps.mbed_os_version.outputs.tag }}-latest > build_info/prod_tag_latest
-          # echo ${{ steps.mbed_os_version.outputs.tag }} > build_info/mbed_os_version
+          echo dev-${{ version }}-${date}-${version} > build_info/dev_tag
+          echo ${version}-${date} > build_info/prod_tag_dated
+          echo ${version} > build_info/mbed_os_version
+          echo ${cache_source} > build_info/cache_source
 
       # archiving and unarchiving are github actions ways to pass variables between jobs    
       - 
@@ -138,13 +127,10 @@ jobs:
           value=`cat prod_tag_dated`
           echo "TAG is $value"
           echo "::set-output name=DOCKER_PROD_TAG_DATED::$value"
-          value=`cat prod_tag_latest`
-          echo "::set-output name=DOCKER_PROD_TAG_LATEST::$value"
           value=`cat mbed_os_version`
           echo "::set-output name=MBED_OS_VERSION::$value"
           value=`cat cache_source`
           echo "::set-output name=CACHE_SOURCE::$value"
-
 
       - 
         name: Set up Docker Buildx
@@ -186,7 +172,7 @@ jobs:
         name: Find DOCKER DIGEST trying to publish (if exists in docker repository)
         id: docker_info_prod
         run: |
-          DIGEST=$(docker run quay.io/skopeo/stable --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} inspect docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }} | jq ".Digest")
+          DIGEST=$(docker run quay.io/skopeo/stable --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} inspect docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.CACHE_SOURCE }} | jq ".Digest")
           echo "::set-output name=DIGEST::$DIGEST"
           echo "Docker DIGEST: $DIGEST"
 
@@ -229,8 +215,6 @@ jobs:
           value=`cat prod_tag_dated`
           echo "TAG is $value"
           echo "::set-output name=DOCKER_PROD_TAG_DATED::$value"
-          value=`cat prod_tag_latest`
-          echo "::set-output name=DOCKER_PROD_TAG_LATEST::$value"
           value=`cat mbed_os_version`
           echo "::set-output name=MBED_OS_VERSION::$value"
 
@@ -290,14 +274,13 @@ jobs:
         id: build_info
         run: |
           value=`cat dev_tag`
-          echo "TAG is $value"
+          echo "DEV TAG is $value"
           echo "::set-output name=DOCKER_DEV_TAG::$value"
           value=`cat prod_tag_dated`
-          echo "TAG is $value"
+          echo "DATED PROD TAG is $value"
           echo "::set-output name=DOCKER_PROD_TAG_DATED::$value"
-          value=`cat prod_tag_latest`
-          echo "::set-output name=DOCKER_PROD_TAG_LATEST::$value"
           value=`cat mbed_os_version`
+          echo "MBED OS VERSION is $value"
           echo "::set-output name=MBED_OS_VERSION::$value"
 
       -
@@ -310,7 +293,12 @@ jobs:
         if: needs.test-container.outputs.STATUS == 'passed'
         name: copy dev tag to prod
         run: |
-          docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }}
+          upto_patch_version=${{ steps.build_info.outputs.MBED_OS_VERSION }}-latest
+          upto_min_version=${{ steps.build_info.outputs.MBED_OS_VERSION%.[0-9]* }}-latest
+          upto_major_version=${{ steps.build_info.outputs.MBED_OS_VERSION%.[0-9]*.[0-9]* }}-latest
+          docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${ upto_patch_version }
+          docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${ upto_min_version }
+          docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${ upto_major_version }
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_DATED }}
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:latest
       
