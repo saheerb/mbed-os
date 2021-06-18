@@ -291,7 +291,7 @@ jobs:
 
       # even if tests skipped (as cache was used as source retag)
       - 
-        if: needs.test-container.result=='skipped1' || needs.test-container.outputs.STATUS == 'passed'
+        if: needs.test-container.result=='skipped' || needs.test-container.outputs.STATUS == 'passed'
         name: copy dev tag to prod
         run: |
           set -x
