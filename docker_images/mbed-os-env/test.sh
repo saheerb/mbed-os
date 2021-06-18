@@ -3,7 +3,7 @@ set -x
 MBED_OS_VERSION=$1
 set -x
 
-if [ MBED_OS_VERSION == "master" ];then
+if [ $MBED_OS_VERSION == "master" ];then
     EXAMPLE_VERSION="development"
 else
     EXAMPLE_VERSION=${MBED_OS_VERSION}
