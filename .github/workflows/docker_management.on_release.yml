@@ -289,8 +289,9 @@ jobs:
         with:
           ref: refs/tags/${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
+      # even if tests skipped (as cache was used as source retag)
       - 
-        if: needs.test-container.outputs.STATUS == 'passed'
+        if: needs.test-container.outputs.STATUS != 'failed'
         name: copy dev tag to prod
         run: |
           upto_patch_version=${{ steps.build_info.outputs.MBED_OS_VERSION }}-latest
@@ -299,9 +300,17 @@ jobs:
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${ upto_patch_version }
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${ upto_min_version }
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${ upto_major_version }
+
+      - 
+        if: needs.test-container.outputs.STATUS == 'passed'
+        name: copy dev tag to prod
+        run: |
+          upto_patch_version=${{ steps.build_info.outputs.MBED_OS_VERSION }}-latest
+          upto_min_version=${{ steps.build_info.outputs.MBED_OS_VERSION%.[0-9]* }}-latest
+          upto_major_version=${{ steps.build_info.outputs.MBED_OS_VERSION%.[0-9]*.[0-9]* }}-latest
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_DATED }}
-          docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:latest
-      
+
+
       - if: needs.test-container.outputs.STATUS == 'failed'
         name: Rename Dev Tag
         run: |
