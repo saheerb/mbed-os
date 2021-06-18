@@ -296,8 +296,11 @@ jobs:
         run: |
           set -x
           upto_patch_version=${{ steps.build_info.outputs.MBED_OS_VERSION }}-latest
+          echo ${upto_patch_version}
           upto_min_version=${${{ steps.build_info.outputs.MBED_OS_VERSION }}%.[0-9]*}-latest
-          upto_major_version=${${{ steps.build_info.outputs.MBED_OS_VERSION }}%.[0-9]*.[0-9]*}-latest 
+          echo ${upto_min_version}
+          upto_major_version=${${{ steps.build_info.outputs.MBED_OS_VERSION }}%.[0-9]*.[0-9]*}-latest
+          echo ${upto_major_version} 
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${ upto_patch_version }
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${ upto_min_version }
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${ upto_major_version }
