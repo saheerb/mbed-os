@@ -53,9 +53,9 @@ jobs:
           fetch-depth: 0
 
       - 
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         name: Sanity check tag of manual trigger
         shell: bash
-        if: "workflow_dispatch" == "${{github.event_name}}"
         run: | 
           if [ -z $(git tag --merged ${GITHUB_REF} ${{ github.event.inputs.mbed_os_release_version }}) ]; then
             echo "Check the tag name ${{ github.event.inputs.mbed_os_release_version }} is not found on branch ${GITHUB_REF}"
