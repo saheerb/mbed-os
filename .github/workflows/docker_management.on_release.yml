@@ -1,4 +1,4 @@
-name: Release or manual update a released version
+name: Release or update Prod docker image
 
 # The workflow is split into several sub jobs
 # 1. prepare-tags: 
@@ -88,7 +88,7 @@ jobs:
             version=`git describe --tags --abbrev=0  --match mbed-os-[0-9].[0-9].[0-9]`
             cache_source=${version}
           fi
-          echo dev-${{ version }}-${date}-${version} > build_info/dev_tag
+          echo dev-${version}-${date}-${version} > build_info/dev_tag
           echo ${version}-${date} > build_info/prod_tag_dated
           echo ${version} > build_info/mbed_os_version
           echo ${cache_source} > build_info/cache_source
