@@ -14,3 +14,4 @@ git checkout ${EXAMPLE_VERSION}
 mbed deploy 
 mbed compile -m K64F -t GCC_ARM
 mbed-tools compile -m K64F -t GCC_ARM
+
