@@ -1,4 +1,4 @@
-name: Publish or Update Dev version of docker image
+name: Publish or Update docker image at head of branch
 
 on:
 
@@ -8,14 +8,13 @@ on:
   push:
     branches: 
       - master
-      - mbed-os-5.15
 
     paths:
       # what about dependencies?
       # what about forks?
       - requirements.txt
       - docker_images/mbed-os-env/**
-      - .github/workflows/docker_management.deploy.yml
+      - .github/workflows/docker_management.branch.yml
 
 
   workflow_dispatch: 

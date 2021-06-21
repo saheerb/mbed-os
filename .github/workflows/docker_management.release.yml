@@ -1,4 +1,4 @@
-name: Release or update Prod docker image
+name: Release or update docker image for a released mbed-os version
 
 # The workflow is split into several sub jobs
 # 1. prepare-tags: 
