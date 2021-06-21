@@ -204,14 +204,6 @@ jobs:
         uses: docker/setup-qemu-action@v1
 
       - 
-        name: Find DEV DOCKER DIGEST
-        id: docker_info_dev
-        run: |
-          DIGEST=$(python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} get-digest -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }} -p ${{ matrix.platform }} )
-          echo "::set-output name=DIGEST::$DIGEST"
-          echo "Docker DIGEST: $DIGEST"
-
-      - 
         name: test the container
         id: test
         uses: addnab/docker-run-action@v3
@@ -272,8 +264,7 @@ jobs:
         run: |
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:failed-${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
 
-      - 
-        name: Delete Dev image
-        run: |
-          python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.ANOTHER_GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
-          # python ./.github/workflows/ci_scripts/docker_hub_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+      # - 
+      #   name: Delete Dev image
+      #   run: |
+      #     python ./.github/workflows/ci_scripts/github_utils.py -u ${{ github.actor }} -p ${{ secrets.ANOTHER_GITHUB_TOKEN }} delete-image -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
