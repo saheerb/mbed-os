@@ -21,6 +21,7 @@ on:
 
 jobs:
   prepare-tags:
+    if: github.repository_owner == 'ARMmbed'
     runs-on: ubuntu-latest
 
     steps:
