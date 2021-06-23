@@ -32,6 +32,17 @@ jobs:
           sudo apt-get update 
           sudo apt-get install -yq cmake ninja-build gcovr libncursesw5 g++-7
 
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+        # with:
+        #   fetch-depth: 0
+
+      - name: file attributes
+        run: |
+          git diff --exit-code
+
+
 #     strategy:
 #       matrix:
 #         platform: [linux/amd64, linux/arm64]
