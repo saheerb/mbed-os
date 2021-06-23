@@ -17,7 +17,8 @@
 on:
   pull_request:
     branches: [ master, travis-migration ]
-
+  push:
+    branches: [ master, travis-migration ]
 
 
 jobs:
