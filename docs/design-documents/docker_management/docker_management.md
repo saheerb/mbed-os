@@ -1,42 +1,12 @@
 # mbed-os-env docker management
 
-# Table of contents
-
-1. [WARNING: THIS IS AN EXAMPLE DESIGN DOCUMENT](#warning-this-is-an-example-design-document).
-1. [Standardized error coding and error handling](#standardized-error-coding-and-error-handling).
-1. [Table of contents](#table-of-contents).
-        1. [Revision history](#revision-history).
-1. [Introduction](#introduction).
-        1. [Overview and background](#overview-and-background).
-        1. [Requirements and assumptions](#requirements-and-assumptions).
-1. [System architecture and high-level design](#system-architecture-and-high-level-design).
-        1. [System architecture and component interaction](#system-architecture-and-component-interaction).
-1. [Detailed design](#detailed-design).
-1. [Usage scenarios and examples](#usage-scenarios-and-examples).
-1. [Tools and configuration changes](#tools-and-configuration-changes).
-1. [Other information](#other-information).
-        1. [Reusability](#reusability).
-        1. [Deprecations](#deprecations).
-        1. [References](#references).
-
-### Revision history
-
-1.0 - Initial version - Saheer Babu - 22/6/2021
-
-# Introduction
 
 ### Overview and background
 
-docker image mbed-os-env bundles all the necessary tools to provide a minial environment to build and test mbed-os applications. This docker image shall be used in Continuous Integration pipelines where mbed-os tools and dependancies are required. This document explains use cases, versioning strategy of the docker image and github action workflows that creates these docker images.
-
-### Goals
-
-* Distribution of docker image that is compatible with released version of mbed-os. 
-* Providing docker image that is compatible with HEAD of "main" branch. 
-* Keeping the released and development docker image up to date.
+docker image mbed-os-env bundles all the necessary tools to provide a minial environment to build and test mbed-os applications. This docker image shall be used in Continuous Integration pipelines and other use casee where mbed-os tools and dependancies are required. This document explains versioning strategy of the docker image and github action workflows that creates these docker images.
 
 
-### types of docker images
+### Types of docker images
 
 * Production docker image
 These are docker images compatible with a released version of mbed-os. For example when `mbed-os-6.14.0` is released, a docker image with tag `mbed-os-6.14-latest` is available.
@@ -72,16 +42,16 @@ mbed-os-env image is created with dockerfile stored in this repository itself. T
 
 ### Docker image versioning
 
-## docker image tag creation and updates example
-
 The picture below illustrates a typical situation where mbed-os accepts changes to main branch on daily basis and makes releases on regular basis.
 
-**On Day-X** There are some changes for active updates (ie, dockerfile has been changed), so these are the docker images created or updated
+![Docker Versioning](./diagrams/docker-versioning.png)
+
+**On Day-X** There are some changes for [active updates](#Type-of-docker-image-updates) (for example dockerfile has been changed), so these are the docker images created or updated
 
 * main-latest 
 * main-day-x - This is a fixed tag
 
- :+1: At night, main-latest tag is checked for Passive Update. 
+:information_source: At night, main-latest tag is checked for [passive updates](#Type-of-docker-image-updates)
 
 **On Day-X+1** Though there are commits to mbed-os source repository. These do not involve changes to Dockerfiles or dependencies like requirements.txt. Hence, no docker image is created at the time of merging the commit. At night, main-latest tag is checked for Passive Update.
 
@@ -91,7 +61,7 @@ The picture below illustrates a typical situation where mbed-os accepts changes 
 * mbed-os-6.14-latest - This docker tag  could be used to work with updated mbed-os-6.14 release. This image is passively updated till next mbed-os release on the branch (typically till mbed-os-6.15.0)
 * mbed-os-6.14-day-x - A fixed docker tag 
 
-:+1: mbed-os-6.14-latest, and mbed-os-6-latest will be passively updated everynight from now on.
+:information_source: mbed-os-6.14-latest, and mbed-os-6-latest will be passively updated everynight from now on.
 
 **On Day X+10** Another new release mbed-os-6.15.0 is made. This creates an image with following docker tag.
 
@@ -99,28 +69,35 @@ The picture below illustrates a typical situation where mbed-os accepts changes 
 * mbed-os-6.15-latest
 * mbed-os-6.15-day-x
 
-From this point, mbed-os-6.14-latest will no longer be passively updated. From this point, only mbed-os-6.15-latest is selected for passive update. Only last release version is passively updated on a branch. 
+:information_source: From this point, mbed-os-6.14-latest will no longer be passively updated. From this point, only mbed-os-6.15-latest is selected for passive update. Only last release version is passively updated on a branch. 
 
-## Workflows
+## GitHub Action Workflows
 
-There are 3 main workflows
+### Goals of docker management workflows
 
-* PR check
+* Distribution of docker image that is compatible with released version of mbed-os. 
+* Providing docker image that is compatible with HEAD of "main" branch. 
+* Keeping the released and development docker image up to date.
+
+There are 4 main workflows
+
+**PR check**
 The purpose of this workflow is to make sure build, and test of mbed-os-env docker image works as expected. Hence this workflow is triggered when mbed-os PR is created with changes in Dockerfile, test files, or workflow files itself has some modifications. Since most of the mbed-os PR doesn't contain docker image related changes, this workflow is not expected to be triggered often.
 
-* Development Docker image publish
+**Publish docker image for the HEAD of mbed-os branch**
 The purpose of this workflow is to update development docker image either when there is an active update or at nightly for passive update.
 
-This workflow can also be triggered manually to update the development image (during the day if needed for example)
+:bulb: This workflow can also be triggered manually to update the development image (during the day if needed for example)
 
-* Production Docker image Creation/Update
+**Production Docker image Creation/Update**
 This workflow will create a new docker image with versioning strategy describe above. Also, triggered nightly for passive update.
 
-This workflow can also be triggered manually to update an old version of released docker image. For example, this workflow could be manually tiggered to update mbed-os-6.14-latest after mbed-os-6.15.0 is released
+:bulb: This workflow can also be triggered manually to update an old version of released docker image. For example, this workflow could be manually tiggered to update mbed-os-6.14-latest after mbed-os-6.15.0 is released
 
+**Prune docker image**
+docker image in temporary area is pruned by this workflow. Number of dates since updated is used as criteria for pruning.
 
-
-## Pipeline
+### Pipeline
 
 docker image management follows typically CI pipeline of build, test, relese follows.
 
@@ -128,26 +105,26 @@ There are some details worth mentioning though.
 
 **Build**
 
-docker buildx command is used for creating multi architecture docker image. To build this with method, one needs to push the image to a remote repository while building it. Since, we need to "test" before release. These are pushed to a temporary docker repository just after building.
+docker buildx command is used for creating multi architecture docker image. To build docker image using buildx, one needs to push the image to a remote repository while building it. Since, we need to "test" before release, the resulting images are pushed to a temporary docker repository just after building.
 
-github container registry doesn't implement yet all the docker manifest APIs. Hence, a few features like deleting tag from an image is not available yet. For implementing the workflows, we create 
+github container registry doesn't implement yet all the docker manifest APIs. Hence, a few features like deleting tag from an image is not available yet. Once these are implemented, we may remove temporary repository and add temporary tags to the image and delete the temporary tags after workflow.
 
 **Test**
-test.sh script takes care of all the testing.
+Once temporary images are built, we need to verify whether image built is same as the image already available as our intended docker image version. This is achieved by comparing the docker digest of two images. Obviously, if digest is same, there is no need to make another release as docker image available as released version is already up to date.
 
-**Release**
-release means moving the image from temporary repository to production repository with necessary tags.
+If the digest is different, (means, new version of docker image is built), test.sh script takes care of all the testing.
 
-docker image in temporary area is also pruned by checking number of dates since updated.
+**Deploy**
+In Deploy job, depending on the result of test job, temporary images are moved to production repository.
 
 
-## Docker repository
+### Docker repository
 github provides free docker image storage for public repositories in github packages. The workflows make use of {{ secrets.GITHUB_TOKEN }}  https://docs.github.com/en/actions/reference/authentication-in-a-workflow 
 
 The packages are directly visible in mbed-os repository.
 
 For deleting images from temporary repository, a new token GITHUB_DELETE_IMAGE_TOKEN needs to be added with package delete perimissions.
 
-## Workflow for forks
+### Workflow for forks
 
-As there is a scheduled trigger of workflow development and release workflow is enabled only when "ARMMbed" repository owner criteria is met. For development, one can change this, make necessary development and put this back to "ARMMbed" when creating pull request to "ARMMbed/mbed-os".
+As there is a scheduled trigger of workflow for development and release images, which inturn creates and updated docker images, workflows are enabled only when "ARMMbed" repository owner criteria is met. For development, one can change this, make necessary development and put this back to "ARMMbed" when creating pull request to "ARMMbed/mbed-os".
