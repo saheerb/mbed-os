@@ -1,7 +1,7 @@
 #!/bin/sh
 set -x
 MBED_OS_VERSION=$1
-
+exit 1
 if [ ${MBED_OS_VERSION} = "master" ];then
     EXAMPLE_VERSION="development"
 else
