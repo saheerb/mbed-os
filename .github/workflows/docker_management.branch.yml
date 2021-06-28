@@ -19,6 +19,9 @@ on:
 
   workflow_dispatch: 
 
+env:
+    REPO_OWNER: 'saheerb'
+    
 jobs:
   prepare-tags:
     if:  github.repository_owner == '${REPO_OWNER}'
