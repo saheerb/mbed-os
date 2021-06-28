@@ -1,4 +1,8 @@
-name: Publish or Update docker image at head of branch
+name: Publish or Update docker image for head of branch
+# TODO: add documentation link
+
+env:
+    REPO_OWNER: 'saheerb'
 
 on:
 
@@ -10,8 +14,6 @@ on:
       - master
 
     paths:
-      # what about dependencies?
-      # what about forks?
       - requirements.txt
       - docker_images/mbed-os-env/**
       - .github/workflows/docker_management.branch.yml
@@ -21,7 +23,7 @@ on:
 
 jobs:
   prepare-tags:
-    if: github.repository_owner == 'saheerb'
+    if: github.repository_owner == "${REPO_OWNER}"
     runs-on: ubuntu-latest
 
     steps:
@@ -65,11 +67,7 @@ jobs:
           echo ${{ steps.extract_branch.outputs.branch }}-${date} > build_info/prod_tag_dated
           echo ${{ steps.extract_branch.outputs.branch }}-latest > build_info/prod_tag_latest
           echo ${{ steps.extract_branch.outputs.branch }} > build_info/mbed_os_version
-          # echo dev-${{ steps.mbed_os_version.outputs.tag }}-${date}-${{ steps.generate-uuid.outputs.uuid }} > build_info/dev_tag
-          # echo ${{ steps.mbed_os_version.outputs.tag }}-${date} > build_info/prod_tag_dated
-          # echo ${{ steps.mbed_os_version.outputs.tag }}-latest > build_info/prod_tag_latest
-          # echo ${{ steps.mbed_os_version.outputs.tag }} > build_info/mbed_os_version
-
+          
       # archiving and unarchiving are github actions ways to pass variables between jobs    
       - 
         name: Archive information 
@@ -225,7 +223,7 @@ jobs:
   deploy-container:
     runs-on: ubuntu-latest
     needs: test-container
-    if:  ${{ always() }}
+    if:  github.repository_owner == "${REPO_OWNER}" && ${{ always() }}
         
     steps:
       -
@@ -263,8 +261,3 @@ jobs:
         name: Rename Dev Tag
         run: |
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:failed-${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
-
-      - 
-        name: Delete old temporary images
-        run: |
-          python ./.github/workflows/ci_scripts/github_utils.py -u ${{ github.actor }} -p ${{ secrets.ANOTHER_GITHUB_TOKEN }} delete-old-images -r mbed-os-env-tmp

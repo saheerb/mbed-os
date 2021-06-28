@@ -19,5 +19,9 @@ jobs:
       - 
         name: Delete old temporary images
         run: |
-          python ./.github/workflows/ci_scripts/github_utils.py -u ${{ github.actor }} -p ${{ secrets.ANOTHER_GITHUB_TOKEN }} delete-old-images -r mbed-os-env-tmp | true
+          # the following command may fail because github package doesn't allow 
+          # deletion if only one image exists or if GITHUB_DELETE_IMAGE_TOKEN is not 
+          # setup. This shouldn't create any alarm as temporary image deletion is 
+          # not a critical activity.
+          python ./.github/workflows/ci_scripts/github_utils.py -u ${{ github.actor }} -p ${{ secrets.DOCKER_MANAGEMENT_TOKEN }} delete-old-images -r mbed-os-env-tmp | true
           

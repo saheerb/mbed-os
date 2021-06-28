@@ -1,5 +1,6 @@
 name: Release or update docker image for a released mbed-os version
 
+# TODO: tidy this up
 # The workflow is split into several sub jobs
 # 1. prepare-tags: 
 #    This step finds the latest mbed-os version (in terms of product version not date)
@@ -22,9 +23,6 @@ name: Release or update docker image for a released mbed-os version
 #    This can be move with another workflow
 
 
-# TODO: Handle cache when new build is made. Currently when mbed-os-6.11.15 is made cache is also set to mbed-os-6.11.15
-# this is slow and creates a new image. Need to set to master-latest when new tag is created and to mbed-os-6.11.15
-# when tag already exists
 # cannot combine with on push on branch as on tags needs to be executed without path exclusion
 on:    
   push:
@@ -41,9 +39,13 @@ on:
         description: 'mbed-os release version for which you want to update docker image.'
         required: true
 
+env:
+    REPO_OWNER: 'saheerb'
+
 jobs:
+  # this job finds the necessary tags to be applied to docker image
   prepare-tags:
-    if: github.repository_owner == 'saheerb'
+    if: github.repository_owner == "${REPO_OWNER}"
     runs-on: ubuntu-latest
 
     steps:
@@ -54,6 +56,9 @@ jobs:
           fetch-depth: 0
 
       - 
+      # if manually triggered makes sure that input tag exists on the branch selected
+      # this is to avoid silly mistakes, for example: mbed-os-7.0.16-latest docker image
+      # getting released on mbed-os-6 branch
         if: ${{ github.event_name == 'workflow_dispatch' }}
         name: Sanity check tag of manual trigger
         shell: bash
@@ -68,11 +73,20 @@ jobs:
         id: generate-uuid
         uses: filipstefansson/uuid-action@v1
 
-# set docker tags we are building, and intending to publish
-# dev-tag is temporary for testing purpose. This should be considered as unstable.
-# dated-tag is created for versioning purpose
-# prod-tag-latest could be used by customers, CI etc for keeping up to date
       - 
+      # set docker tags we are building, and intending to release
+      # this workflow can be executed when a tag is pushed, scheduled, or manual trigger
+      # depending on the trigger cache source and version of mbed-os will change
+      #
+      # when trigger is due to tag pushed (ie, a new mbed-os release is made), 
+      #     we are targeting to build docker image for the tag
+      #     best bet for cache source is the image built for head of the branch
+      # when trigger is manual
+      #     we are targeting to build docker image for the input tag in workflow
+      #     best bet for cache source is input tag itself as it should already be there
+      # when trigger is scheduled
+      #     we are targeting to build docker image for the last tag on the branch
+      #     best bet for cache source is input tag itself as it should already be there
         name: Get build information
         shell: bash
         run: |
@@ -116,7 +130,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: build-info
-          
+
+      # DOCKER_DEV_TAG is temporary image name.
+      # DOCKER_PROD_TAG_DATED is fixed tag
+      # prod-tag-latest could be used by customers, CI etc for keeping up to date
       - 
         name: Get build info from archive
         shell: bash
@@ -189,14 +206,13 @@ jobs:
   test-container:
     runs-on: ubuntu-latest
     needs: build-container
-    # no need to test (nor publish) if we already have the same image in dockerhub
+    # no need to test if we already have the same image in dockerhub
     if: needs.build-container.outputs.DEV_DIGEST != needs.build-container.outputs.PROD_DIGEST
     outputs:
       STATUS: ${{ steps.test.outputs.STATUS }}
     strategy:
       matrix:
         platform: [linux/amd64, linux/arm64]
-        # platform: [linux/amd64]
         
     steps:
       - 
@@ -251,10 +267,9 @@ jobs:
   deploy-container:
     runs-on: ubuntu-latest
     needs: test-container
-    if:  ${{ always() }}
+    if:  github.repository_owner == "${REPO_OWNER}" && ${{ always() }}
         
     steps:
-
       - 
         name: unarchive artefacts
         uses: actions/download-artifact@v2
@@ -282,7 +297,7 @@ jobs:
         with:
           ref: refs/tags/${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
-      # even if tests skipped (as cache was used as source retag)
+      # even if tests skipped, as cache used is HEAD of branch, copy images to right tag
       - 
         if: needs.test-container.result=='skipped' || needs.test-container.outputs.STATUS == 'passed'
         name: copy dev tag to prod
@@ -294,23 +309,19 @@ jobs:
           upto_major_version=${upto_patch_version%.[0-9]*.[0-9]*}-latest
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${upto_patch_version}
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${upto_min_version}
-          # if not manually triggered
+          # TODO: do this only if not manually triggered
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${upto_major_version}
 
+      # when tests succeed copy to fixed tags
       - 
         if: needs.test-container.outputs.STATUS == 'passed'
         name: copy dev tag to prod dated tag
         run: |
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_DATED }}
 
-
+      # when tests fail, rename to "failed-" for easy identification
+      # TODO: do not remove in pruning
       - if: needs.test-container.outputs.STATUS == 'failed'
         name: Rename Dev Tag
         run: |
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:failed-${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
-
-      - 
-        name: Delete old temporary images
-        run: |
-          python ./.github/workflows/ci_scripts/github_utils.py -u ${{ github.actor }} -p ${{ secrets.ANOTHER_GITHUB_TOKEN }} delete-old-images -r mbed-os-env-tmp
-          

@@ -117,6 +117,14 @@ If the digest is different, (means, new version of docker image is built), test.
 **Deploy**
 In Deploy job, depending on the result of test job, temporary images are moved to production repository.
 
+### What needs to be done for LTS branches?
+
+TODO
+** Duplicate workflow files for each of LTS branches **
+For PR, and on push to development version
+** Merge workflow files to LTS branch **
+For PR, and on push to development version
+
 
 ### Docker repository
 github provides free docker image storage for public repositories in github packages. The workflows make use of {{ secrets.GITHUB_TOKEN }}  https://docs.github.com/en/actions/reference/authentication-in-a-workflow 
@@ -128,3 +136,4 @@ For deleting images from temporary repository, a new token GITHUB_DELETE_IMAGE_T
 ### Workflow for forks
 
 As there is a scheduled trigger of workflow for development and release images, which inturn creates and updated docker images, workflows are enabled only when "ARMMbed" repository owner criteria is met. For development, one can change this, make necessary development and put this back to "ARMMbed" when creating pull request to "ARMMbed/mbed-os".
+
