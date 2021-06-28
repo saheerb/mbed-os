@@ -23,10 +23,18 @@ on:
 
 jobs:
   prepare-tags:
-    if: github.repository_owner == ${{ REPO_OWNER }}
+    # if: github.repository_owner == "${REPO_OWNER}"
     runs-on: ubuntu-latest
 
     steps:
+      - 
+        name: Extract branch name
+        shell: bash
+        run: |
+          echo "${REPO_OWNER}"
+          exit 1
+
+
       - 
         name: Extract branch name
         shell: bash
