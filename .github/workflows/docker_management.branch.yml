@@ -2,7 +2,7 @@ name: Publish or Update docker image for head of branch
 # TODO: add documentation link
 
 env:
-    REPO_OWNER: 'saheerb1'
+    REPO_OWNER: ${{ 'saheerb1' }}
 
 on:
 
@@ -23,7 +23,7 @@ on:
 
 jobs:
   prepare-tags:
-    # if: github.repository_owner == "${REPO_OWNER}"
+    if: github.repository_owner == "${REPO_OWNER}"
     runs-on: ubuntu-latest
 
     steps:
