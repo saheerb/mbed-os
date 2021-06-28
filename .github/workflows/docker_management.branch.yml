@@ -229,19 +229,13 @@ jobs:
   deploy-container:
     runs-on: ubuntu-latest
     needs: test-container
-    if: github.repository_owner == 'saheerb'
         
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-
       - 
         name: unarchive artefacts
         uses: actions/download-artifact@v2
         with:
           name: build-info
-        
         
       - 
         name: Get build info from archive
@@ -263,7 +257,7 @@ jobs:
         run: |
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }}
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_DATED }}
-      
+
       - if: needs.test-container.outputs.STATUS == 'failed'
         name: Rename Dev Tag
         run: |

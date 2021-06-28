@@ -204,7 +204,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-container
     # no need to test if we already have the same image in dockerhub
-    if: needs.build-container.outputs.DEV_DIGEST != needs.build-container.outputs.PROD_DIGEST
+    # if: needs.build-container.outputs.DEV_DIGEST != needs.build-container.outputs.PROD_DIGEST
     outputs:
       STATUS: ${{ steps.test.outputs.STATUS }}
     strategy:
@@ -264,7 +264,7 @@ jobs:
   deploy-container:
     runs-on: ubuntu-latest
     needs: test-container
-    if: github.repository_owner == 'saheerb'
+    # if: github.repository_owner == 'saheerb'
     # if:  ${{ always() }}
         
     steps:
