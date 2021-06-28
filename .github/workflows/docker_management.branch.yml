@@ -229,7 +229,7 @@ jobs:
   deploy-container:
     runs-on: ubuntu-latest
     needs: test-container
-    if: needs.test-container.result=='skipped' ||
+    if: github.repository_owner == 'saheerb'
         
     steps:
       -
