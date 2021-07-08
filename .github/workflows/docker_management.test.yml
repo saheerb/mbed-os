@@ -22,8 +22,11 @@ on:
 
 jobs:
   prepare-tags:
+    env: 
+      repo-owner: saheerb
     # condition on environmental variable doesn't work at job level
-    if: github.repository_owner == 'saheerb'
+    # if: github.repository_owner == 'saheerb'
+    if: github.repository_owner == env.repo-owner
 
     runs-on: ubuntu-latest
 
@@ -165,6 +168,8 @@ jobs:
           echo "::set-output name=STATUS::passed"
       
   deploy-container:
+    # this job is running always and to skip for forked repo
+    # add condition on every step.
     env: 
       repo-owner: saheerb
     runs-on: ubuntu-latest
