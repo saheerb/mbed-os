@@ -158,6 +158,7 @@ jobs:
         run: |
           echo "::set-output name=STATUS::failed"
           ls
+          exit 1
           echo "::set-output name=STATUS::passed"
       
   deploy-container:
