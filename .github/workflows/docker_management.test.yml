@@ -196,17 +196,17 @@ jobs:
           echo "::set-output name=DOCKER_PROD_TAG_LATEST::$value"
           
       - 
-        if: ${{ github.repository_owner == env.repo-owner }} && needs.test-container.outputs.STATUS == 'passed'
+        if: ${{ github.repository_owner == env.repo-owner && needs.test-container.outputs.STATUS == 'passed' }}
         name: copy dev tag to prod
         run: |
           echo "passed"
           
-      - if: ${{ github.repository_owner == env.repo-owner }} && needs.test-container.result=='skipped'
+      - if: ${{ github.repository_owner == env.repo-owner  && needs.test-container.result=='skipped' }}
         name: Skipped
         run: |
           echo "skipped"
 
-      - if: ${{ github.repository_owner == env.repo-owner }} && needs.test-container.outputs.STATUS == 'failed'
+      - if: ${{ github.repository_owner == env.repo-owner && needs.test-container.outputs.STATUS == 'failed' }}
         name: failed
         run: |
           echo "failed"
