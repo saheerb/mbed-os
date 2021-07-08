@@ -26,7 +26,7 @@ jobs:
       repo-owner: saheerb
     # condition on environmental variable doesn't work at job level
     # if: github.repository_owner == 'saheerb'
-    if: github.repository_owner == env.repo-owner
+    if: ${{ github.repository_owner == env.repo-owner }}
 
     runs-on: ubuntu-latest
 
