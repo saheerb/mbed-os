@@ -24,7 +24,7 @@ jobs:
   prepare-tags:
     env: 
       repo-owner: saheerb
-    if: github.repository_owner == env.repo-owner
+    if: ${{ github.repository_owner == env.repo-owner }}
     runs-on: ubuntu-latest
 
     steps:
