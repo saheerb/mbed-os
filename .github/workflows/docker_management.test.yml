@@ -106,7 +106,7 @@ jobs:
         name: Find DEV DOCKER DIGEST
         id: docker_info_dev
         run: |
-          echo "::set-output name=DIGEST::1"
+          echo "::set-output name=DIGEST::3"
 
   test-container:
     runs-on: ubuntu-latest
