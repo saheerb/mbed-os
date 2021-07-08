@@ -25,7 +25,7 @@ jobs:
     env: 
       repo-owner: 'saheerb1'
     # if: github.repository_owner == saheerb1
-    if: ${{ github.repository_owner == env.repo-owner }}
+    if: ${{ github.repository_owner == 'saheerb1' }}
     runs-on: ubuntu-latest
 
     steps:
