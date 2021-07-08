@@ -22,10 +22,8 @@ on:
 
 jobs:
   prepare-tags:
-    env: 
-      repo-owner: 'saheerb1'
-    # if: github.repository_owner == saheerb1
-    if: github.repository_owner == 'saheerb1'
+    # condition on environmental variable doesn't work at job level
+    if: github.repository_owner == 'saheerb'
 
     runs-on: ubuntu-latest
 
@@ -168,7 +166,7 @@ jobs:
       
   deploy-container:
     env: 
-      repo-owner: saheerb1
+      repo-owner: saheerb
     runs-on: ubuntu-latest
     needs: test-container
     if: ${{ always() }}
@@ -206,7 +204,8 @@ jobs:
         run: |
           echo "skipped"
 
-      - if: ${{ github.repository_owner == env.repo-owner && needs.test-container.outputs.STATUS == 'failed' }}
+      # - if: ${{ github.repository_owner == env.repo-owner && needs.test-container.outputs.STATUS == 'failed' }}
+      - if: github.repository_owner == env.repo-owner && needs.test-container.outputs.STATUS == 'failed'
         name: failed
         run: |
           echo "failed"
