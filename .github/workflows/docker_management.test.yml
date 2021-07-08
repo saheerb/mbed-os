@@ -25,7 +25,8 @@ jobs:
     env: 
       repo-owner: 'saheerb1'
     # if: github.repository_owner == saheerb1
-    
+    if: github.repository_owner == 'saheerb1'
+
     runs-on: ubuntu-latest
 
     steps:
@@ -173,14 +174,14 @@ jobs:
     if: ${{ always() }}
     steps:
       - 
-        if: github.repository_owner == ${{env.repo-owner}}
+        if: ${{ github.repository_owner == env.repo-owner }}
         name: unarchive artefacts
         uses: actions/download-artifact@v2
         with:
           name: build-info
         
       - 
-        if: github.repository_owner == ${{env.repo-owner}}
+        if: ${{ github.repository_owner == env.repo-owner }}
         name: Get build info from archive
         shell: bash
         id: build_info
@@ -195,17 +196,17 @@ jobs:
           echo "::set-output name=DOCKER_PROD_TAG_LATEST::$value"
           
       - 
-        if: github.repository_owner == ${{env.repo-owner}} && needs.test-container.outputs.STATUS == 'passed'
+        if: ${{ github.repository_owner == env.repo-owner }} && needs.test-container.outputs.STATUS == 'passed'
         name: copy dev tag to prod
         run: |
           echo "passed"
           
-      - if: github.repository_owner == ${{env.repo-owner}} && needs.test-container.result=='skipped'
+      - if: ${{ github.repository_owner == env.repo-owner }} && needs.test-container.result=='skipped'
         name: Skipped
         run: |
           echo "skipped"
 
-      - if: github.repository_owner == ${{env.repo-owner}} && needs.test-container.outputs.STATUS == 'failed'
+      - if: ${{ github.repository_owner == env.repo-owner }} && needs.test-container.outputs.STATUS == 'failed'
         name: failed
         run: |
           echo "failed"
