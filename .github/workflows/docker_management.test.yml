@@ -204,8 +204,7 @@ jobs:
         run: |
           echo "skipped"
 
-      # - if: ${{ github.repository_owner == env.repo-owner && needs.test-container.outputs.STATUS == 'failed' }}
-      - if: github.repository_owner == env.repo-owner && needs.test-container.outputs.STATUS == 'failed'
+      - if: ${{ github.repository_owner == env.repo-owner && needs.test-container.outputs.STATUS == 'failed' }}
         name: failed
         run: |
           echo "failed"
