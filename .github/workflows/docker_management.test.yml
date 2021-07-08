@@ -22,7 +22,9 @@ on:
 
 jobs:
   prepare-tags:
-    if: github.repository_owner == 'saheerb1'
+    env: 
+      repo-owner: saheerb
+    if: github.repository_owner == ${{env.repo-owner}}
     runs-on: ubuntu-latest
 
     steps:
@@ -162,29 +164,21 @@ jobs:
           echo "::set-output name=STATUS::passed"
       
   deploy-container:
+    env: 
+      repo-owner: saheerb
     runs-on: ubuntu-latest
     needs: test-container
     if: ${{ always() }}
     steps:
-      # -
-      #   id: repo_match
-      #   name: match repository org
-      #   shell: bash
-      #   run: |
-      #     if [${{github.repository_owner}} == 'saheerb1'];then
-      #       echo "::set-output name=STATUS::skip"
-      #     else
-      #       echo "::set-output name=STATUS::pass"
-      #     fi
       - 
-        if: github.repository_owner == 'saheerb1'
+        if: github.repository_owner == ${{env.repo-owner}}
         name: unarchive artefacts
         uses: actions/download-artifact@v2
         with:
           name: build-info
         
       - 
-        if: github.repository_owner == 'saheerb1'
+        if: github.repository_owner == ${{env.repo-owner}}
         name: Get build info from archive
         shell: bash
         id: build_info
@@ -199,17 +193,17 @@ jobs:
           echo "::set-output name=DOCKER_PROD_TAG_LATEST::$value"
           
       - 
-        if: github.repository_owner == 'saheerb1' && needs.test-container.outputs.STATUS == 'passed'
+        if: github.repository_owner == ${{env.repo-owner}} && needs.test-container.outputs.STATUS == 'passed'
         name: copy dev tag to prod
         run: |
           echo "passed"
           
-      - if: github.repository_owner == 'saheerb1' && needs.test-container.result=='skipped'
+      - if: github.repository_owner == ${{env.repo-owner}} && needs.test-container.result=='skipped'
         name: Skipped
         run: |
           echo "skipped"
 
-      - if: github.repository_owner == 'saheerb1' && needs.test-container.outputs.STATUS == 'failed'
+      - if: github.repository_owner == ${{env.repo-owner}} && needs.test-container.outputs.STATUS == 'failed'
         name: failed
         run: |
           echo "failed"
