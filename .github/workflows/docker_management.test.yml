@@ -166,16 +166,16 @@ jobs:
     needs: test-container
     if: ${{ always() }}
     steps:
-      -
-        id: repo_match
-        name: match repository org
-        shell: bash
-        run: |
-          if [${{github.repository_owner}} == 'saheerb1'];then
-            echo "::set-output name=STATUS::skip"
-          else
-            echo "::set-output name=STATUS::pass"
-          fi
+      # -
+      #   id: repo_match
+      #   name: match repository org
+      #   shell: bash
+      #   run: |
+      #     if [${{github.repository_owner}} == 'saheerb1'];then
+      #       echo "::set-output name=STATUS::skip"
+      #     else
+      #       echo "::set-output name=STATUS::pass"
+      #     fi
       - 
         if: github.repository_owner == 'saheerb1'
         name: unarchive artefacts
