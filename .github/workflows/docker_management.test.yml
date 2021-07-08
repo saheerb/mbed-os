@@ -1,7 +1,9 @@
 name: Publish or Update docker image for head of branch
 # TODO: add documentation link
 
-
+env: 
+  repo-owner: saheerb
+  
 on:
 
   schedule:
@@ -23,8 +25,7 @@ on:
 jobs:
   prepare-tags:
     runs-on: ubuntu-latest
-    env: 
-      repo-owner: saheerb
+
     # condition on environmental variable doesn't work at job level
     # if: github.repository_owner == 'saheerb'
     if: ${{ github.repository_owner == env.repo-owner }}
