@@ -32,11 +32,11 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
 
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+      # -
+      #   name: Checkout
+      #   uses: actions/checkout@v2
+      #   with:
+      #     fetch-depth: 0
 
       - 
         name: Set UUID
@@ -143,13 +143,13 @@ jobs:
           value=`cat mbed_os_version`
           echo "::set-output name=MBED_OS_VERSION::$value"
 
-      - 
-        name: Checkout
-        uses: actions/checkout@v2
+      # - 
+      #   name: Checkout
+      #   uses: actions/checkout@v2
 
-      - 
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+      # - 
+      #   name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v1
 
       - 
         name: Get build info from archive
@@ -164,7 +164,7 @@ jobs:
   deploy-container:
     runs-on: ubuntu-latest
     needs: test-container
-        
+    if: ${{ always() }}
     steps:
       - 
         name: unarchive artefacts
