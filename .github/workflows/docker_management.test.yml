@@ -25,11 +25,12 @@ jobs:
     env: 
       repo-owner: 'saheerb1'
     # if: github.repository_owner == saheerb1
-    if: ${{ github.repository_owner == 'saheerb1' }}
+    
     runs-on: ubuntu-latest
 
     steps:
       - 
+        if: ${{ github.repository_owner == env.repo-owner }}
         name: Extract branch name
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
