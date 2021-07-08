@@ -166,7 +166,7 @@ jobs:
       
   deploy-container:
     env: 
-      repo-owner: saheerb
+      repo-owner: saheerb1
     runs-on: ubuntu-latest
     needs: test-container
     if: ${{ always() }}
@@ -204,7 +204,7 @@ jobs:
         run: |
           echo "skipped"
 
-      - if: ${{ github.repository_owner == env.repo-owner && needs.test-container.outputs.STATUS == 'failed' }}
+      - if: github.repository_owner == env.repo-owner && needs.test-container.outputs.STATUS == 'failed'
         name: failed
         run: |
           echo "failed"
