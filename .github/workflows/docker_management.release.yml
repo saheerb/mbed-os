@@ -204,7 +204,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-container
     # no need to test if we already have the same image in dockerhub
-    # if: needs.build-container.outputs.DEV_DIGEST != needs.build-container.outputs.PROD_DIGEST
+    if: needs.build-container.outputs.DEV_DIGEST != needs.build-container.outputs.PROD_DIGEST
     outputs:
       STATUS: ${{ steps.test.outputs.STATUS }}
     strategy:
@@ -264,17 +264,18 @@ jobs:
   deploy-container:
     runs-on: ubuntu-latest
     needs: test-container
-    # if: github.repository_owner == 'saheerb'
-    # if:  ${{ always() }}
+    if:  ${{ always() }}
         
     steps:
       - 
+        if: github.repository_owner == 'saheerb'
         name: unarchive artefacts
         uses: actions/download-artifact@v2
         with:
           name: build-info
         
       - 
+        if: github.repository_owner == 'saheerb'
         name: Get build info from archive
         shell: bash
         id: build_info
@@ -290,6 +291,7 @@ jobs:
           echo "::set-output name=MBED_OS_VERSION::$value"
 
       -
+        if: github.repository_owner == 'saheerb'
         name: Checkout
         uses: actions/checkout@v2
         with:
@@ -297,7 +299,7 @@ jobs:
 
       # even if tests skipped, as cache used is HEAD of branch, copy images to right tag
       - 
-        if: needs.test-container.result=='skipped'
+        if: github.repository_owner == 'saheerb' and needs.test-container.result=='skipped'
         name: copy dev tag to prod
         run: |
           set -x
@@ -312,7 +314,7 @@ jobs:
 
       # when tests succeed copy to fixed tags
       - 
-        if: needs.test-container.outputs.STATUS == 'passed'
+        if: github.repository_owner == 'saheerb' and needs.test-container.outputs.STATUS == 'passed'
         name: copy dev tag to prod dated tag
         run: |
           set -x
@@ -329,7 +331,7 @@ jobs:
 
       # when tests fail, rename to "failed-" for easy identification
       # TODO: do not remove in pruning
-      - if: needs.test-container.outputs.STATUS == 'failed'
+      - if: github.repository_owner == 'saheerb' and  needs.test-container.outputs.STATUS == 'failed'
         name: Rename Dev Tag
         run: |
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:failed-${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
