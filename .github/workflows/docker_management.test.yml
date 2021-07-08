@@ -22,7 +22,7 @@ on:
 
 jobs:
   prepare-tags:
-    if: github.repository_owner == 'saheerb'
+    if: github.repository_owner == 'saheerb1'
     runs-on: ubuntu-latest
 
     steps:
