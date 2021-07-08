@@ -169,7 +169,8 @@ jobs:
       -
         id: repo_match
         name: match repository org
-        shell:
+        shell: bash
+        run: |
           if [${{github.repository_owner}} == 'saheerb1'];then
             echo "::set-output name=STATUS::skip"
           else
