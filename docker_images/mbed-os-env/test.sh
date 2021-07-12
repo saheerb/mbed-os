@@ -13,5 +13,6 @@ mbed import mbed-os-example-blinky
 cd mbed-os-example-blinky
 git checkout ${EXAMPLE_VERSION}
 mbed deploy 
+
 mbed compile -m K64F -t GCC_ARM
 mbed-tools compile -m K64F -t GCC_ARM

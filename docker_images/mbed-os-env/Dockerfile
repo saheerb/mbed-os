@@ -8,9 +8,6 @@ ARG WORKDIR=/root
 
 # ------------------------------------------------------------------------------
 # Install tools via apt
-RUN ls
-
-ADD requirements.txt .
 ENV DEBIAN_FRONTEND=noninteractive
 RUN set -x \
     && apt -y update \
@@ -45,19 +42,19 @@ RUN set -x \
     && exec bash \
     && : # last line
 
+# Set up mbed environment
+WORKDIR /tmp/
+COPY requirements.txt .
+RUN set -x \
+    && pip3 install -r requirements.txt  \
+    && : # last line
+
 # ------------------------------------------------------------------------------
 # Install Python modules (which are not included in requirements.txt)
 RUN set -x \
     && pip3 install -U \
     mbed-cli \
     mbed-tools \
-    && : # last line
-
-# Set up mbed environment
-WORKDIR /tmp/
-COPY requirements.txt .
-RUN set -x \
-    && pip3 install -r requirements.txt  \
     && : # last line
 
 # ------------------------------------------------------------------------------
@@ -86,7 +83,7 @@ ENV PATH="${PATH}:${MBED_GCC_ARM_PATH}"
 
 # ------------------------------------------------------------------------------
 # Display, check and save environment settings
-# NOTE: using bash instead of Ubuntu default dash due to unsupport for pipefail
+# NOTE: using bash instead of Ubuntu default bash due to unsupport for pipefail
 # Pipefail is crucial here, if the tools didn't install properly, docker build should not pass because of piping 
 RUN /bin/bash -c \
    "set -x -o pipefail \

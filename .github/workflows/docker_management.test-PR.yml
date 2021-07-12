@@ -57,6 +57,5 @@ jobs:
           image: mbed-os-env:a_pr_test
           shell: bash
           run: |
-            set -e
             uname -m
             ./docker_images/mbed-os-env/test.sh 
