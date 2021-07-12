@@ -170,7 +170,8 @@ jobs:
       - 
         name: Checkout
         uses: actions/checkout@v2
-        path: mbed-os
+        with:
+          path: mbed-os
 
       - 
         name: Set up QEMU
@@ -191,7 +192,6 @@ jobs:
           shell: bash
           
           run: |
-            set -e
             uname -m
             ls
             ./mbed-os/docker_images/mbed-os-env/test.sh ${{ steps.build_info.outputs.MBED_OS_VERSION }}
