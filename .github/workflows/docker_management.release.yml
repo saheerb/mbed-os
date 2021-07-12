@@ -191,6 +191,7 @@ jobs:
         with:
           repository: ARMmbed/mbed-os-example-blinky
           path: mbed-os-example-blinky
+          fetch-depth: 0
 
 
       - 
