@@ -11,6 +11,7 @@ on:
   push:
     tags: 
       - mbed-os-6.[0-9]+.[0-9]+
+      - mbed-os-6.[0-9]+.[0-9]+-rc.*
 
   schedule:
     - cron:  '15 4 * * *'
@@ -191,19 +192,24 @@ jobs:
           repository: ARMmbed/mbed-os-example-blinky
           path: mbed-os-example-blinky
 
+
       - 
         name: update the example application version to test against correct version
+        # When mbed-os tag is applied, and workflow is triggered to build RELEASE image, example application with same tag will be available yet.
+        # use release candidate branch to test the image in that case.
+        # When RELEASE image is passively checked, tag should be available in example application repo, then use it.
         shell: bash
         id: example_app_info
         run: |
           cd mbed-os-example-blinky
           EXAMPLE_VERSION="release_candidate"
           MBED_OS_VERSION=${{ steps.build_info.outputs.MBED_OS_VERSION }}
+          # if tag is present in example repo, use the tag 
           if git rev-parse "$MBED_OS_VERSION" >/dev/null 2>&1; then
             EXAMPLE_VERSION=$MBED_OS_VERSION
           fi
-          echo "::set-output VERSION=MBED_OS_VERSION::$value"
-          git checkout $EXAMPLE_VERSION
+          # echo "::set-output VERSION=MBED_OS_VERSION::$EXAMPLE_VERSION"
+          git checkout ${EXAMPLE_VERSION}
 
       - 
         name: Checkout
