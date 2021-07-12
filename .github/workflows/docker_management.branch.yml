@@ -199,6 +199,7 @@ jobs:
             ls
             #./mbed-os/docker_images/mbed-os-env/test.sh DEVELOPMENT ${{ steps.build_info.outputs.MBED_OS_VERSION }}
             cd mbed-os-example-blinky
+            mbed deploy
             # build using CLI1
             mbed compile -m K64F -t GCC_ARM
 
