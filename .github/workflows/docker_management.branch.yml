@@ -167,6 +167,8 @@ jobs:
           value=`cat mbed_os_version`
           echo "::set-output name=MBED_OS_VERSION::$value"
 
+      # as the dev images are created only for master branch, run test against
+      # development branch of blinky
       - 
         name: Checkout
         uses: actions/checkout@v2
@@ -174,19 +176,6 @@ jobs:
           repository: ARMmbed/mbed-os-example-blinky
           path: mbed-os-example-blinky
           ref: development
-
-      - 
-        name: Remove mbed-os
-        shell: bash
-        run: |
-          rm -rf mbed-os
-
-      - 
-        name: Checkout
-        uses: actions/checkout@v2
-        with:
-          path: mbed-os-example-blinky/mbed-os
-
       - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
