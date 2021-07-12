@@ -171,7 +171,21 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
         with:
-          path: mbed-os
+          repository: ARMmbed/mbed-os-example-blinky
+          path: mbed-os-example-blinky
+          ref: development
+
+      - 
+        name: Remove mbed-os
+        shell: bash
+        run: |
+          rm -rf mbed-os
+
+      - 
+        name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: mbed-os-example-blinky/mbed-os
 
       - 
         name: Set up QEMU
@@ -194,7 +208,13 @@ jobs:
           run: |
             uname -m
             ls
-            ./mbed-os/docker_images/mbed-os-env/test.sh DEVELOPMENT ${{ steps.build_info.outputs.MBED_OS_VERSION }}
+            #./mbed-os/docker_images/mbed-os-env/test.sh DEVELOPMENT ${{ steps.build_info.outputs.MBED_OS_VERSION }}
+            cd mbed-os-example-blinky
+            # build using CLI1
+            mbed compile -m K64F -t GCC_ARM
+
+            # build using CLI2
+            mbed-tools compile -m K64F -t GCC_ARM         
             
       
   deploy-container:
