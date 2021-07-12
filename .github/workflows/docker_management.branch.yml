@@ -194,7 +194,7 @@ jobs:
           run: |
             uname -m
             ls
-            ./mbed-os/docker_images/mbed-os-env/test.sh ${{ steps.build_info.outputs.MBED_OS_VERSION }}
+            ./mbed-os/docker_images/mbed-os-env/test.sh DEVELOPMENT ${{ steps.build_info.outputs.MBED_OS_VERSION }}
             
       
   deploy-container:

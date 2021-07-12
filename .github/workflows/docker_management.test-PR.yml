@@ -58,4 +58,4 @@ jobs:
           shell: bash
           run: |
             uname -m
-            ./docker_images/mbed-os-env/test.sh 
+            ./docker_images/mbed-os-env/test.sh PR
