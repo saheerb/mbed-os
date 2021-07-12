@@ -64,7 +64,7 @@ jobs:
           platforms: ${{ matrix.platform }}
           file: ./mbed-os-example-blinky/mbed-os/docker_images/mbed-os-env/Dockerfile
           load: true
-          tags: mbed-os-env:a_pr_test_${{ matrix.platform }}
+          tags: mbed-os-env:a_pr_test
 
 
       - 
@@ -73,7 +73,7 @@ jobs:
         uses: addnab/docker-run-action@v2
         with:
           options: -v ${{ github.workspace }}:/work -w=/work
-          image: mbed-os-env:a_pr_test_${{ matrix.platform }}
+          image: mbed-os-env:a_pr_test
           shell: bash
           run: |
             uname -m
