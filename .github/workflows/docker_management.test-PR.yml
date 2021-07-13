@@ -47,7 +47,7 @@ jobs:
           # platforms: linux/amd64
           push: true
           file: ./docker_images/mbed-os-env/Dockerfile
-          tags: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ GITHUB_SHA }}
+          tags: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ github.sha }}
 
   # test-container:
   #   runs-on: ubuntu-latest
