@@ -11,7 +11,6 @@ on:
   push:
     tags: 
       - mbed-os-6.[0-9]+.[0-9]+
-      - mbed-os-6.[0-9]+.[0-9]+-rc.*
 
   schedule:
     - cron:  '15 4 * * *'
@@ -80,7 +79,6 @@ jobs:
           echo ${version}-${date} > build_info/prod_tag_dated
           echo ${version} > build_info/mbed_os_version
 
-      # archiving and unarchiving are github actions ways to pass variables between jobs    
       - 
         name: Archive information 
         uses: actions/upload-artifact@v2
