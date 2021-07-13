@@ -15,6 +15,8 @@ def get_digest(ctx, repository, tag, platform=None):
     command =  f"docker run quay.io/skopeo/stable --creds={ctx.obj['username']}:{ctx.obj['passwd']} inspect docker://ghcr.io/{ctx.obj['username']}/{repository}:{tag} --raw"
     output = subprocess.run(command.split(), stdout=subprocess.PIPE).stdout.decode('utf-8')
     output = json.loads(output)
+    # logging.info(output)
+
     images = output["manifests"]
     digest = ""
     if len(images) > 1 and platform == None:
