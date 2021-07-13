@@ -6,9 +6,11 @@ name: Publish or Update docker image for head of branch
 
 on:
 
+  # passive update once a week
   schedule:
-    - cron:  '15 4 * * *'
+    - cron:  '15 4 * * 7'
 
+  # build on master branch when there is changes for active update
   push:
     branches: 
       - master
@@ -19,6 +21,7 @@ on:
       - .github/workflows/docker_management.branch.yml
 
 
+  # manual trigger when needed 
   workflow_dispatch: 
 
 
@@ -33,11 +36,6 @@ jobs:
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
-
-      - 
-        name: Print event name
-        shell: bash
-        run: echo ${{github.event_name}}
 
       -
         name: Checkout
@@ -65,16 +63,14 @@ jobs:
           echo ${{ steps.extract_branch.outputs.branch }}-latest > build_info/prod_tag_latest
           echo ${{ steps.extract_branch.outputs.branch }} > build_info/mbed_os_version
           
-      # archiving and unarchiving are github actions ways to pass variables between jobs    
       - 
         name: Archive information 
         uses: actions/upload-artifact@v2
         with:
           name: build-info
           path: build_info
+
           
-
-
   build-container:
     runs-on: ubuntu-latest
     needs: prepare-tags
@@ -235,6 +231,5 @@ jobs:
       - 
         name: copy dev tag to prod
         run: |
-          ls 
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_LATEST }}
           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_DATED }}

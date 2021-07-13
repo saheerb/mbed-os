@@ -1,6 +1,6 @@
 name: Release or update docker image for a released mbed-os version
 
-# Read TODO: add design link before editing this file
+# Design details: [TODO: add design link] 
 
 # This work flow is disabled for forked repositories. 
 # If you need to enable it, find references for github.repository_owner in this file
@@ -14,7 +14,7 @@ on:
       - mbed-os-6.[0-9]+.[0-9]+-rc.*
 
   schedule:
-    - cron:  '15 4 * * *'
+    - cron:  '15 4 * * 7'
 
   workflow_dispatch:
     inputs:
@@ -271,14 +271,12 @@ jobs:
           echo "MBED OS VERSION is $value"
           echo "::set-output name=MBED_OS_VERSION::$value"
 
-
       -
         name: Checkout
         uses: actions/checkout@v2
         with:
           ref: refs/tags/${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
-      # when tests succeed copy to fixed tags
       - 
         name: copy dev tag to prod dated tag
         run: |

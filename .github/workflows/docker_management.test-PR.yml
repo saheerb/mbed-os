@@ -1,6 +1,6 @@
 name: Build and test image when PR is raised
 
-# This workflow is triggered when Dockerfile relatedt or github action itself changes are made in a PR
+# This workflow is triggered when Dockerfile related or github action itself changes are made in a PR
 # The workflow is quite simple - builds and test the image. Release of newer version is done only when PR is merged.
 
 on:
@@ -12,16 +12,11 @@ on:
       - requirements.txt
 
 jobs:
-
   build-container:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        # platform: [linux/amd64, linux/arm64]
-        platform: [linux/amd64]
+    needs: prepare-tags
+    
     steps:
-
       - 
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -30,56 +25,124 @@ jobs:
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
-      # as the dev images are created only for master branch, run test against
-      # development branch of blinky
       - 
-        name: Checkout
-        uses: actions/checkout@v2
+        name: Login to DockerHub
+        uses: docker/login-action@v1 
         with:
-          repository: ARMmbed/mbed-os-example-blinky
-          path: mbed-os-example-blinky
-          ref: development
-
-      -
-        name: Remove mbed-os from example-application
-        shell: bash
-        run: |
-          cd mbed-os-example-blinky
-          rm -rf mbed-os
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       -
         name: Checkout
         uses: actions/checkout@v2
-        with:
-          path: mbed-os-example-blinky/mbed-os
-        
-      
-      # cache documentation: https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md
+
       -
-        name: Build with remote cache
+        name: Build docker containers
         uses: docker/build-push-action@v2
         id: docker_build_dev
         with:
-          context: ./mbed-os-example-blinky/mbed-os
-          platforms: ${{ matrix.platform }}
-          file: ./mbed-os-example-blinky/mbed-os/docker_images/mbed-os-env/Dockerfile
-          load: true
-          tags: mbed-os-env:a_pr_test
+          context: .
+          platforms: linux/amd64,linux/arm64
+          # platforms: linux/amd64
+          push: true
+          file: ./docker_images/mbed-os-env/Dockerfile
+          tags: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ GITHUB_SHA }}
 
+  # test-container:
+  #   runs-on: ubuntu-latest
+  #   needs: build-container
+  #   strategy:
+  #     matrix:
+  #       # platform: [linux/amd64, linux/arm64]
+  #       platform: [linux/amd64]
+        
+  #   steps:
+  #     # as the dev images are created only for master branch, run test against
+  #     # development branch of blinky
+  #     - 
+  #       name: Checkout example blinky
+  #       uses: actions/checkout@v2
+  #       with:
+  #         repository: ARMmbed/mbed-os-example-blinky
+  #         path: mbed-os-example-blinky
+  #         ref: development
+  #         fetch-depth: 0
 
-      - 
-        name: test the container
-        id: test
-        uses: addnab/docker-run-action@v2
-        with:
-          options: -v ${{ github.workspace }}:/work -w=/work
-          image: mbed-os-env:a_pr_test
-          shell: bash
-          run: |
-            uname -m
-            cd mbed-os-example-blinky
-            # build using CLI1
-            mbed compile -m K64F -t GCC_ARM
+  #     - 
+  #       name: Checkout
+  #       uses: actions/checkout@v2
+  #       with:
+  #         path: mbed-os-example-blinky/mbed-os
 
-            # build using CLI2
-            mbed-tools compile -m K64F -t GCC_ARM   
+  #     - 
+  #       name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v1
+
+  #     - 
+  #       name: test the container
+  #       id: test
+  #       uses: addnab/docker-run-action@v3
+  #       with:
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+  #         registry: ghcr.io
+  #         options: -v ${{ github.workspace }}:/work -w=/work
+  #         image: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+  #         # image: ghcr.io/${{ github.actor }}/mbed-os-env-tmp@${{ steps.docker_info_dev.outputs.DIGEST }}
+  #         shell: bash
+  #         run: |
+  #           uname -m
+  #           cd mbed-os-example-blinky
+  #           # build using CLI1
+  #           mbed compile -m K64F -t GCC_ARM
+
+  #           # build using CLI2
+  #           mbed-tools compile -m K64F -t GCC_ARM
+            
+  # deploy-container:
+  #   runs-on: ubuntu-latest
+  #   needs: test-container
+  #   steps:
+  #     - 
+  #       name: unarchive artefacts
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: build-info
+        
+  #     - 
+  #       name: Get build info from archive
+  #       shell: bash
+  #       id: build_info
+  #       run: |
+  #         value=`cat dev_tag`
+  #         echo "DEV TAG is $value"
+  #         echo "::set-output name=DOCKER_DEV_TAG::$value"
+  #         value=`cat prod_tag_dated`
+  #         echo "DATED PROD TAG is $value"
+  #         echo "::set-output name=DOCKER_PROD_TAG_DATED::$value"
+  #         value=`cat mbed_os_version`
+  #         echo "MBED OS VERSION is $value"
+  #         echo "::set-output name=MBED_OS_VERSION::$value"
+
+  #     -
+  #       name: Checkout
+  #       uses: actions/checkout@v2
+  #       with:
+  #         ref: refs/tags/${{ steps.build_info.outputs.MBED_OS_VERSION }}
+
+  #     - 
+  #       name: copy dev tag to prod dated tag
+  #       run: |
+  #         set -x
+  #         echo ${{ needs.test-container.result }}
+  #         upto_patch_version=${{ steps.build_info.outputs.MBED_OS_VERSION }}-latest
+  #         upto_min_version=${upto_patch_version%.[0-9]*}-latest
+  #         upto_major_version=${upto_patch_version%.[0-9]*.[0-9]*}-latest
+  #         docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${upto_patch_version}
+  #         docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${upto_min_version}
+  #         if [ "workflow_dispatch" != "${{github.event_name}}" ];then
+  #           docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${upto_major_version}
+  #         fi
+  #         # copy to fixed tag
+  #         docker run quay.io/skopeo/stable --src-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} --dest-creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} copy --all docker://ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}  docker://ghcr.io/${{ github.actor }}/mbed-os-env:${{ steps.build_info.outputs.DOCKER_PROD_TAG_DATED }}
