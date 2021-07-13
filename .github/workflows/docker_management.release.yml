@@ -146,8 +146,8 @@ jobs:
         id: docker_build_dev
         with:
           context: .
-          # platforms: linux/amd64,linux/arm64
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
+          # platforms: linux/amd64
           push: true
           file: ./docker_images/mbed-os-env/Dockerfile
           tags: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
@@ -218,6 +218,15 @@ jobs:
           path: mbed-os-example-blinky/mbed-os
 
       - 
+        name: Find DEV DOCKER DIGEST
+        id: docker_info
+        run: |
+          cd mbed-os-example-blinky/mbed-os
+          DIGEST=$(python ./.github/workflows/ci_scripts/github_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} get-digest -r mbed-os-env-tmp -t ${{ steps.build_info.outputs.DOCKER_DEV_TAG }} -p ${{ matrix.platform }} )
+          echo "::set-output name=DIGEST::$DIGEST"
+          echo "Docker DIGEST: $DIGEST"
+
+      - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
@@ -230,8 +239,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
           options: -v ${{ github.workspace }}:/work -w=/work
-          image: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
-          # image: ghcr.io/${{ github.actor }}/mbed-os-env-tmp@${{ steps.docker_info_dev.outputs.DIGEST }}
+          # image: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+          image: ghcr.io/${{ github.actor }}/mbed-os-env-tmp@${{ steps.docker_info.outputs.DIGEST }}
           shell: bash
           run: |
             uname -m
@@ -268,12 +277,6 @@ jobs:
           value=`cat mbed_os_version`
           echo "MBED OS VERSION is $value"
           echo "::set-output name=MBED_OS_VERSION::$value"
-
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-        with:
-          ref: refs/tags/${{ steps.build_info.outputs.MBED_OS_VERSION }}
 
       - 
         name: copy dev tag to prod dated tag

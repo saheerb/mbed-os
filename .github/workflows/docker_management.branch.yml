@@ -132,6 +132,8 @@ jobs:
           push: true
           file: ./docker_images/mbed-os-env/Dockerfile
           tags: ghcr.io/${{ github.actor }}/mbed-os-env-tmp:${{ steps.build_info.outputs.DOCKER_DEV_TAG }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/mbed-os-env:master-latest
+          cache-to: type=inline
 
   test-container:
     runs-on: ubuntu-latest
