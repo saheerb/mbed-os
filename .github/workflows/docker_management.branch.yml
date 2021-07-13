@@ -8,7 +8,7 @@ on:
 
   # passive update once a week
   schedule:
-    - cron:  '15 4 * * 7'
+    - cron:  '15 4 * * *'
 
   # build on master branch when there is changes for active update
   push:
