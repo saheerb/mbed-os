@@ -11,14 +11,14 @@ This docker image is the official mbed-OS development environment.
 
 ## Pull docker images
 ```bash
-docker pull mbedos/mbed-os-env
+docker pull ghcr.io/ARMmbed/mbed-os-env
 
 ```
 
 ## Run mbed OS environment without HW support (build mbed images only)
 launch docker by
 ```bash
-docker run -it mbedos/mbed-os-env:<label>
+docker run -it docker pull ghcr.io/ARMmbed/mbed-os-env:<label>
 ```
 Then you will have the container with mbed OS development environment.
 you should be able to compile mbed commands/examples as recommenced in mbed documentations
@@ -32,7 +32,7 @@ mbed compile -m <TARGET> -t GCC_ARM
 ## Run mbed OS environment with HW support (USB pass-through)
 If you want to use this docker container connect and flash your targets. you need some extra command line option to pass-through your USB devices.
 ```bash
-sudo docker run -it --privileged -v /dev/disk/by-id:/dev/disk/by-id -v /dev/serial/by-id:/dev/serial/by-id mbed-os-env:<label>
+sudo docker run -it --privileged -v /dev/disk/by-id:/dev/disk/by-id -v /dev/serial/by-id:/dev/serial/by-id ghcr.io/ARMmbed/mbed-os-env:<label>
 ```
 Then you will have the container with mbed OS development environment.
 To make sure your mbed targets been detected, you might want to manually run the mount command and `mbedls` to check

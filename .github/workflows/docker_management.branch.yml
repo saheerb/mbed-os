@@ -4,7 +4,6 @@ name: Publish or Update docker image for head of branch
 # and replace with ARMmbed with your organisation/account name
 # Read more details in TODO: add design link
 
-
 on:
 
   # passive update once a week
@@ -140,8 +139,8 @@ jobs:
     needs: build-container
     strategy:
       matrix:
-        # platform: [linux/amd64, linux/arm64]
-        platform: [linux/amd64]
+        platform: [linux/amd64, linux/arm64]
+        # platform: [linux/amd64]
         
     steps:
       - 
@@ -207,6 +206,7 @@ jobs:
           
           run: |
             uname -m
+            exit 0
             ls
             #./mbed-os/docker_images/mbed-os-env/test.sh DEVELOPMENT ${{ steps.build_info.outputs.MBED_OS_VERSION }}
             cd mbed-os-example-blinky

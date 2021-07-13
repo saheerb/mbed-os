@@ -12,7 +12,7 @@ docker image mbed-os-env bundles all the necessary tools to provide a minimal en
 These are docker images compatible with a released version of mbed-os. For example when `mbed-os-6.14.0` is released, a docker image with tag `mbed-os-6.14-latest` is available.
 
 **Development docker image**
-These are docker images compatible with a `HEAD` of the mbed-os branch. For example when master-latest docker image is available which is compatible with `HEAD` of `master` branch.
+These are docker images compatible with a `HEAD` of the mbed-os master branch. These are tagged with `master-latest`. 
 
 
 ### Type of docker image updates
@@ -47,20 +47,20 @@ The picture below illustrates a typical situation where mbed-os accepts changes 
 
 **On Day-X** There are some changes for [active updates](#Type-of-docker-image-updates) (for example dockerfile has been changed), so these are the docker images created or updated
 
-* master-latest 
-* master-day-x - This is a fixed tag
+* mbed-os-env:master-latest 
+* mbed-os-env:<master-day-x> - This is a fixed tag
 
-:information_source: At night, master-latest tag is checked for [passive updates](#Type-of-docker-image-updates)
+:information_source: master-latest tag is checked for [passive updates](#Type-of-docker-image-updates) as scheduled in the workflow.
 
-**On Day-X+1** Though there are commits to mbed-os source repository. These do not involve changes to Dockerfile or dependencies like requirements.txt. Hence, no docker image is created at the time of merging the commit. At night, master-latest tag is checked for Passive Update.
+**On Day-X+1** Though there are commits to mbed-os source repository. These do not involve changes to Dockerfile or dependencies like requirements.txt. Hence, no docker image is created at the time of merging the commit. 
 
 **On Day-X+2** A new mbed-os release `mbed-os-6.14.0` is created. This creates an image with following docker tag.
 
-* mbed-os-6-latest - This docker tag could be used to get a compatible image for latest mbed-os-6 release.
-* mbed-os-6.14-latest - This docker tag  could be used to work with updated mbed-os-6.14 release. This image is passively updated till next mbed-os release on the branch (typically till mbed-os-6.15.0)
-* mbed-os-6.14-day-x - A fixed docker tag 
+* mbed-os-env:mbed-os-6-latest - This docker tag could be used to get a compatible image for latest mbed-os-6 release.
+* mbed-os-env:mbed-os-6.14-latest - This docker tag  could be used to work with updated mbed-os-6.14 release. This image is passively updated till next mbed-os release on the branch (typically till mbed-os-6.15.0)
+* mbed-os-env:mbed-os-6.14-day-x - A fixed docker tag 
 
-:information_source: mbed-os-6.14-latest, and mbed-os-6-latest will be passively updated every night from now on.
+:information_source: mbed-os-6.14-latest, and mbed-os-6-latest will be passively updated as scheduled in th workflow.
 
 **On Day X+10** Another new release mbed-os-6.15.0 is made. This creates an image with following docker tag.
 
@@ -132,4 +132,20 @@ There are two repositories being created or used for managing docker image
 ### Workflow for forks
 
 As there is a scheduled trigger of workflow for development and release images, which inturn creates and updated docker images in github container registries, workflows are enabled only when "ARMMbed" repository owner criteria is met. For development, one can change this, make necessary development and put this back to "ARMMbed" when creating pull request to "ARMMbed/mbed-os".
+
+### Usage in example application
+![example app](./diagrams/example-app-usage.png)
+Example application repository mainly has three branches
+
+* master - This branch points to the latest last release version of mbed-os. 
+* development - This branch points to the master branch of mbed-os.
+* release_candidate - This branch points to the release_candidate tag of mbed-os.
+
+*Release workflow of mbed-os*
+* A rc tag is applied to mbed-os (for example mbed-os-6.16.0-rc). 
+* `development` branch of mbed-os is merged to `release_candidate`. Also, applies rc tag to mbed-os.lib
+* After RC tests are done, mbed-os release tag is applied (for example mbed-os-6.16.0-rc)
+* `release_candidate` branch is merged to master and release tag is applied `mbed-os-6.16.0`
+
+For the above branches `mbed-os-env:master-latest` can be used as at the time of `release_candidate`(and `release tag` creation), example application will be pointing to master version of mbed-os. 
 

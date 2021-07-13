@@ -30,21 +30,8 @@ RUN set -x \
     && update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1 \
     && : # last line
 
-
 RUN set -x \
     && pip3 install -U cmake
-
-# Cmake (Mbed OS requires >=3.19.0-rc3 version which is not available in Ubuntu 20.04 repository)
-# RUN set -x \
-#     && (cd /tmp \
-#     && [ "$(uname -m)" = "aarch64" ] && \
-#         CMAKE_SCRIPT="cmake-3.19.3-Linux-aarch64.sh" || \
-#         CMAKE_SCRIPT="cmake-3.19.3-Linux-x86_64.sh" \  
-#     && wget --progress=dot:giga https://github.com/Kitware/CMake/releases/download/v3.19.3/${CMAKE_SCRIPT} \
-#     && sh ${CMAKE_SCRIPT} --exclude-subdir --prefix=/usr/local \
-#     && rm -rf ${CMAKE_SCRIPT}) \
-#     && exec bash \
-#     && : # last line
 
 # Set up mbed environment
 WORKDIR /tmp/
