@@ -6,14 +6,17 @@ import time
 import json
 import subprocess
 
+
 @click.command()
 @click.pass_context
 @click.option("-r", "--repository", required=True)
 @click.option("-t", "--tag", required=True)
 @click.option("-p", "--platform", required=False)
 def get_digest(ctx, repository, tag, platform=None):
-    command =  f"docker run quay.io/skopeo/stable --creds={ctx.obj['username']}:{ctx.obj['passwd']} inspect docker://ghcr.io/{ctx.obj['username']}/{repository}:{tag} --raw"
-    output = subprocess.run(command.split(), stdout=subprocess.PIPE).stdout.decode('utf-8')
+    command = f"docker run quay.io/skopeo/stable --creds={ctx.obj['username']}:{ctx.obj['passwd']} inspect docker://ghcr.io/{ctx.obj['username']}/{repository}:{tag} --raw"
+    output = subprocess.run(command.split(), stdout=subprocess.PIPE).stdout.decode(
+        "utf-8"
+    )
     output = json.loads(output)
     # logging.info(output)
 
@@ -25,7 +28,6 @@ def get_digest(ctx, repository, tag, platform=None):
         )
         sys.exit(1)
 
-
     for image in images:
         if platform != None:
             if (platform.split("/")[0] == image["platform"]["os"]) and (
@@ -36,6 +38,7 @@ def get_digest(ctx, repository, tag, platform=None):
             digest = image["digest"]
 
     print(digest)
+
 
 # delete images older than provided argument (number_of_days)
 @click.command()
