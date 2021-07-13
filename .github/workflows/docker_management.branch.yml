@@ -17,7 +17,7 @@ on:
 jobs:
   deploy-container:
     runs-on: ubuntu-latest
-    step:
+    steps:
       - 
         name: build information
         shell: bash
