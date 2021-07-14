@@ -216,7 +216,6 @@ jobs:
             fetch-depth: 0
         -
           name: frozen tool check
-          shell: bash
           run: |
               set -x
               git diff --name-only origin/${GITHUB_BASE_REF}
