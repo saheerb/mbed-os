@@ -219,6 +219,7 @@ jobs:
           name: frozen tool check
           shell: bash
           run: |
+            unset -e
             which sh
             llll
             ls
@@ -228,6 +229,7 @@ jobs:
           name: frozen tool check
           run: |
               set -x
+              unset -e
               git diff --name-only origin/${GITHUB_BASE_REF}
               frozen_files=`\
                   git diff --name-only origin/${GITHUB_BASE_REF} \
