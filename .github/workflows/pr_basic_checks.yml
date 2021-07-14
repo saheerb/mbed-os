@@ -208,30 +208,31 @@ jobs:
 
   frozen-tools-check:
       runs-on: ubuntu-latest
-      -
-        name: Checkout repo
-        uses: actions/checkout@v2
-      -
-        name: frozen tool check
-        run: |
-            frozen_files=`\
-                git diff --name-only origin/${GITHUB_BASE_REF} \
-                    | egrep \
-                      -e "^tools/build_api*" \
-                      -e "^tools/config*" \
-                      -e "^tools/export*" \
-                      -e "^tools/notifier*" \
-                      -e "^tools/paths*" \
-                      -e "^tools/resources*" \
-                      -e "^tools/targets*" \
-                      -e "^tools/toolchains*" \
-                      -e "^tools/utils*" \
-                      -e "^$"`
-            if [ -z "$frozen_files" ]; then
-                echo "Success!";
-            else
-                echo -e "Failure: Frozen files were modified\n$frozen_files";
-                echo -e "Please see https://os.mbed.com/blog/entry/Introducing-the-new-Mbed-Tools/" \
-                        "\nfor why we've frozen the legacy tools.";
-                false;
-            fi
+      steps:
+        -
+          name: Checkout repo
+          uses: actions/checkout@v2
+        -
+          name: frozen tool check
+          run: |
+              frozen_files=`\
+                  git diff --name-only origin/${GITHUB_BASE_REF} \
+                      | egrep \
+                        -e "^tools/build_api*" \
+                        -e "^tools/config*" \
+                        -e "^tools/export*" \
+                        -e "^tools/notifier*" \
+                        -e "^tools/paths*" \
+                        -e "^tools/resources*" \
+                        -e "^tools/targets*" \
+                        -e "^tools/toolchains*" \
+                        -e "^tools/utils*" \
+                        -e "^$"`
+              if [ -z "$frozen_files" ]; then
+                  echo "Success!";
+              else
+                  echo -e "Failure: Frozen files were modified\n$frozen_files";
+                  echo -e "Please see https://os.mbed.com/blog/entry/Introducing-the-new-Mbed-Tools/" \
+                          "\nfor why we've frozen the legacy tools.";
+                  false;
+              fi
