@@ -218,6 +218,7 @@ jobs:
           name: frozen tool check
           run: |
               set -x
+              git diff --name-only origin/${GITHUB_BASE_REF}
               frozen_files=`\
                   git diff --name-only origin/${GITHUB_BASE_REF} \
                       | egrep \
@@ -231,6 +232,7 @@ jobs:
                         -e "^tools/toolchains*" \
                         -e "^tools/utils*" \
                         -e "^$"`
+              echo $frozen_files
               if [ -z "$frozen_files" ]; then
                   echo "Success!";
               else
