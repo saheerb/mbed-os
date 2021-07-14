@@ -1,0 +1,268 @@
+on:
+  pull_request:
+
+jobs:
+  # basic:
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: ghcr.io/saheerb/mbed-os-env:master-test
+
+  #   steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v2
+  #       with:
+  #         fetch-depth: 0
+  #     - 
+  #       name: "file attributes"
+  #       run: |
+  #         git diff --exit-code
+  #     - 
+  #       name: license check existing files
+  #       run: |
+  #         set -x
+  #         ls
+  #         mkdir -p SCANCODE
+  #         git diff --name-only --diff-filter=ad origin/${GITHUB_BASE_REF}.. \
+  #           | ( grep '.\(c\|cpp\|h\|hpp\|py\)$' || true ) \
+  #           | ( grep -v '^tools/test/toolchains/api_test.py' || true ) \
+  #           | while read file; do cp --parents "${file}" SCANCODE; done
+  #         ls SCANCODE
+  #         scancode -l --json-pp scancode.json SCANCODE
+  #         python ./tools/test/travis-ci/scancode-evaluate.py scancode.json || true
+  #         cat scancode-evaluate.log
+  #         COUNT=$(cat scancode-evaluate.log | grep 'File:' | grep -v 'SPDX' | wc -l) || true
+  #         if [ $COUNT = 0 ]; then
+  #           echo "License check OK";
+  #           true;
+  #         else
+  #           echo "License check failed, please review license issues found in modified files";
+  #           false;
+  #         fi
+
+  #     - 
+  #       name: license check new files
+  #       run: |
+  #         mkdir -p SCANCODE_NEW_FILES
+  #         git diff --name-only --diff-filter=A origin/${GITHUB_BASE_REF}.. \
+  #           | ( grep '.\(c\|cpp\|h\|hpp\|py\)$' || true ) \
+  #           | ( grep -v '^tools/test/toolchains/api_test.py' || true ) \
+  #           | while read file; do cp --parents "${file}" SCANCODE_NEW_FILES; done
+  #         ls SCANCODE_NEW_FILES
+  #         scancode -l --json-pp scancode.json SCANCODE_NEW_FILES
+  #         python ./tools/test/travis-ci/scancode-evaluate.py scancode.json || true
+  #         cat scancode-evaluate.log
+  #         COUNT=$(cat scancode-evaluate.log | grep 'File:' | grep -v 'SPDX' | wc -l) || true
+  #         if [ $COUNT = 0 ]; then
+  #           echo "License check OK";
+  #           true;
+  #         else
+  #           echo "License check failed, please review license issues found in new files";
+  #           false;
+  #         fi
+
+  #     - 
+  #       name: "UTF-8 Check"
+  #       run: |
+  #         # Make sure we're not introducing any text which is not UTF-8 encoded
+  #         git diff origin/${GITHUB_BASE_REF} -U0 | ( grep -a '^+' || true ) | ( ! grep -axv '.*' )
+
+  #     - 
+  #       name: "include check"
+  #       run: |
+  #         ! git grep '^#include\s["'"']mbed.h['"'"]$' -- '*.c' '*.h' '*.cpp' '*.hpp' \
+  #             ':!*platform_mbed.h' ':!*TESTS/*' ':!TEST_APPS/' ':!UNITTESTS/' \
+  #             ':!*tests/*' ':!*targets/*' ':!*TARGET_*' ':!*unsupported/*' \
+  #             ':!*events/tests/*' ':!*drivers/tests/*'
+
+  #     - 
+  #       name: astyle checks
+  #       run: |
+  #         git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
+  #           | ( grep '.*\.\(c\|cpp\|h\|hpp\)$' || true ) \
+  #           | ( grep -v -f .codecheckignore || true ) \
+  #           | while read file; do astyle -n --options=.astylerc "${file}"; done
+  #         git diff --exit-code --diff-filter=d --color
+
+  #     - 
+  #       name: spell checks
+  #       run: |
+  #         apt-get update -y
+  #         apt-get install -y aspell
+  #         ./tools/test/travis-ci/doxy-spellchecker/spell.sh drivers .codecheckignore
+  #         ./tools/test/travis-ci/doxy-spellchecker/spell.sh platform .codecheckignore
+  #         ./tools/test/travis-ci/doxy-spellchecker/spell.sh events .codecheckignore
+  #         ./tools/test/travis-ci/doxy-spellchecker/spell.sh rtos .codecheckignore
+  #         ./tools/test/travis-ci/doxy-spellchecker/spell.sh connectivity/netsocket .codecheckignore
+
+  #     - 
+  #       name: doxygen
+  #       run: |
+  #         apt-get install -y ccache
+  #         ccache -s
+  #         mkdir BUILD
+  #         # Assert that the Doxygen build produced no warnings.
+  #         # The strange command below asserts that the Doxygen command had an
+  #         # output of zero length
+  #         doxygen doxyfile_options 2>&1
+  #         # Once Mbed OS has been fixed, enable the full test by replacing the top line with this:
+  #         # - ( ! doxygen doxyfile_options 2>&1 | grep . )
+  #         # Assert that all binary libraries are named correctly
+  #         # The strange command below asserts that there are exactly 0 libraries
+  #         # that do not start with lib
+  #         find "(" -name "*.a" -or -name "*.ar" ")" -and -not -name "lib*" |
+  #         tee BUILD/badlibs |
+  #         sed -e "s/^/Bad library name found: /" && [ ! -s BUILD/badlibs ]
+  #         # Assert that all assembler files are named correctly
+  #         # The strange command below asserts that there are exactly 0 libraries
+  #         # that do end with .s
+  #         find  -name "*.s" | tee BUILD/badasm |
+  #         sed -e "s/^/Bad Assembler file name found: /" && [ ! -s BUILD/badasm ]
+
+  # python-tests:
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     -
+  #       name: Checkout repo
+  #       uses: actions/checkout@v2
+
+
+  #     - uses: actions/setup-python@v2
+  #       with:
+  #         python-version: '3.7'
+
+  #     -
+  #       name: install dependencies
+  #       run: |
+  #         pip install -r requirements.txt
+  #         pip install icetea pytz
+  #         pip install mock==2.0.0 attrs==19.1.0 pytest==3.3.0 'pylint>=1.9,<2' 'hypothesis>=3,<4' 'coverage>=4.5,<5'
+
+  #     -
+  #       name: pytest
+  #       run: |
+  #         PYTHONPATH=. coverage run -a -m pytest tools/test
+  #         python tools/test/pylint.py
+  #         coverage run -a tools/project.py -S | sed -n '/^Total/p'
+  #         coverage html
+
+  # Pin-validation:
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     -
+  #       name: Checkout repo
+  #       uses: actions/checkout@v2
+  #       with:
+  #         fetch-depth: 0
+
+  #     - uses: actions/setup-python@v2
+  #       with:
+  #         python-version: '3.7'
+
+  #     -
+  #       name: install dependencies
+  #       run: |
+  #         pip install tabulate argparse
+
+  #     -
+  #       name: validate pins
+  #       run: |
+  #         set -x
+  #         git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
+  #           | ( grep '.*[\\|\/]PinNames.h$' || true ) \
+  #           | while read file; do python ./hal/tests/pinvalidate/pinvalidate.py -vfp "${file}"; done
+  #         git diff --exit-code --diff-filter=d --color
+
+  cmake-check:
+    env: 
+      NAME: mbed-test-mode-check 
+      ROOT: tools/cmake/tests/mbed_test_mode/ 
+      TOOLCHAIN: GCC_ARM 
+      TARGET_NAME: K64F 
+      PROFILE: develop
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/saheerb/mbed-os-env:master-test
+    steps:
+      -
+        name: Checkout repo
+        uses: actions/checkout@v2
+        
+      -
+        name: cmake build
+        run: |
+          mbedtools configure -p ${{ env.ROOT}} -t ${{ env.TOOLCHAIN }} -m ${{ env.TARGET_NAME }} --mbed-os-path .
+          cmake -S ${ROOT} -B ${{ env.ROOT }}/cmake_build/${TARGET_NAME}/${{ env.PROFILE }}/${{ env.TOOLCHAIN }}/ -GNinja -DCMAKE_BUILD_TYPE=${{ env.PROFILE }}
+          cmake --build ${{ env.ROOT }}/cmake_build/${{ env.TARGET_NAME }}/${{ env.PROFILE }}/${{ env.TOOLCHAIN }}/
+
+
+      -
+        name: cmake unittest
+        run: |
+          echo ctest --build-and-test . build --build-generator Ninja --build-options -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc --test-command ctest        
+          ctest --build-and-test . build --build-generator Ninja --build-options -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc --test-command ctest        
+          gcovr --gcov-executable gcov -r . ./build -s -e ".*\.h" --exclude-directories=$TRAVIS_BUILD_DIR/build/UNITTESTS --exclude-directories=$TRAVIS_BUILD_DIR/build/_deps
+          ccache -s
+
+          # mbedtools configure -p ${{ env.ROOT}} -t ${{ env.TOOLCHAIN }} -m ${{ env.TARGET_NAME }} --mbed-os-path .
+          # cmake -S ${ROOT} -B ${{ env.ROOT }}/cmake_build/${TARGET_NAME}/${{ env.PROFILE }}/${{ env.TOOLCHAIN }}/ -GNinja -DCMAKE_BUILD_TYPE=${{ env.PROFILE }}
+          # cmake --build ${{ env.ROOT }}/cmake_build/${{ env.TARGET_NAME }}/${{ env.PROFILE }}/${{ env.TOOLCHAIN }}/
+
+
+
+    # ### Mbed OS unittest ###
+    # - &cmake-build-run-unittest
+    #   stage: "CMake"
+    #   name: "CMake unittest build"
+    #   env: NAME=cmake_unittest
+    #   install:
+    #     # Hide Travis-preinstalled CMake
+    #     # The Travis-preinstalled CMake is unfortunately not installed via apt, so we
+    #     # can't replace it with an apt-supplied version very easily. Additionally, we
+    #     # can't permit the Travis-preinstalled copy to survive, as the Travis default
+    #     # path lists the Travis CMake install location ahead of any place where apt
+    #     # would install CMake to. Instead of apt removing or upgrading to a new CMake
+    #     # version, we must instead delete the Travis copy of CMake.
+    #     - sudo rm -rf /usr/local/cmake*
+    #   script:
+    #     - echo ctest --build-and-test . build --build-generator Ninja --build-options -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_C_COMPILER=gcc-7 --test-command ctest        
+    #     - ctest --build-and-test . build --build-generator Ninja --build-options -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_C_COMPILER=gcc-7 --test-command ctest        
+    #     - gcovr --gcov-executable gcov-7 -r . ./build -s -e ".*\.h" --exclude-directories=$TRAVIS_BUILD_DIR/build/UNITTESTS --exclude-directories=$TRAVIS_BUILD_DIR/build/_deps
+    #     - ccache -s
+
+    # ### Frozen tools check ###
+    # - &frozen-tools-vm
+    #   stage: "Frozen tools check"
+    #   name: "Frozen tools check"
+    #   env: NAME=frozen_tools_check
+    #   before_script:
+    #     # Fetch the base branch to compare against
+    #     - git fetch origin "${TRAVIS_BRANCH}" --depth=1
+    #   script:
+    #     # Reject any changes to tools that would require a re-release of the
+    #     # tools for the online compiler.
+    #     - >-
+    #         frozen_files=`\
+    #             git diff --name-only FETCH_HEAD..HEAD \
+    #                 | egrep \
+    #                   -e "^tools/build_api*" \
+    #                   -e "^tools/config*" \
+    #                   -e "^tools/export*" \
+    #                   -e "^tools/notifier*" \
+    #                   -e "^tools/paths*" \
+    #                   -e "^tools/resources*" \
+    #                   -e "^tools/targets*" \
+    #                   -e "^tools/toolchains*" \
+    #                   -e "^tools/utils*" \
+    #                   -e "^$"`
+    #         if [ -z "$frozen_files" ]; then
+    #             echo "Success!";
+    #         else
+    #             echo -e "Failure: Frozen files were modified\n$frozen_files";
+    #             echo -e "Please see https://os.mbed.com/blog/entry/Introducing-the-new-Mbed-Tools/" \
+    #                     "\nfor why we've frozen the legacy tools.";
+    #             false;
+    #         fi
+
+
