@@ -209,11 +209,20 @@ jobs:
   frozen-tools-check:
       runs-on: ubuntu-latest
       steps:
+        # -
+        #   name: Checkout repo
+        #   uses: actions/checkout@v2
+        #   with:
+        #     fetch-depth: 0
+
         -
-          name: Checkout repo
-          uses: actions/checkout@v2
-          with:
-            fetch-depth: 0
+          name: frozen tool check
+          run: |
+            which sh
+            llll
+            ls
+            ls -l
+            echo "test"
         -
           name: frozen tool check
           run: |
