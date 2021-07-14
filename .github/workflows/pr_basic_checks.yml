@@ -217,6 +217,7 @@ jobs:
 
         -
           name: frozen tool check
+          shell: bash
           run: |
             which sh
             llll
