@@ -189,27 +189,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - uses: actions/setup-python@v2
-      #   with:
-      #     python-version: '3.7'
-
-      # -
-      #   name: install dependencies
-      #   run: |
-      #     pip install tabulate argparse
-
       -
         name: validate pins
         run: |
-          set -x
-          ( find . -name '.*[\\|\/]PinNames.h$' || true ) \
+          git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
+            | ( grep '.*[\\|\/]PinNames.h$' || true ) \
             | while read file; do python ./hal/tests/pinvalidate/pinvalidate.py -vfp "${file}"; done
           git diff --exit-code --diff-filter=d --color
-
-          # git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
-          #   | ( grep '.*[\\|\/]PinNames.h$' || true ) \
-          #   | while read file; do python ./hal/tests/pinvalidate/pinvalidate.py -vfp "${file}"; done
-          # git diff --exit-code --diff-filter=d --color
 
   cmake-check:
     env: 
