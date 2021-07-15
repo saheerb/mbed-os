@@ -202,10 +202,14 @@ jobs:
         name: validate pins
         run: |
           set -x
-          git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
-            | ( grep '.*[\\|\/]PinNames.h$' || true ) \
+          ( find . '.*[\\|\/]PinNames.h$' || true ) \
             | while read file; do python ./hal/tests/pinvalidate/pinvalidate.py -vfp "${file}"; done
           git diff --exit-code --diff-filter=d --color
+
+          # git diff --name-only --diff-filter=d origin/${GITHUB_BASE_REF} \
+          #   | ( grep '.*[\\|\/]PinNames.h$' || true ) \
+          #   | while read file; do python ./hal/tests/pinvalidate/pinvalidate.py -vfp "${file}"; done
+          # git diff --exit-code --diff-filter=d --color
 
   cmake-check:
     env: 
@@ -241,6 +245,8 @@ jobs:
 
   frozen-tools-check:
       runs-on: ubuntu-latest
+      container:
+        image: ghcr.io/saheerb/mbed-os-env:master-test
       steps:
         -
           name: Checkout repo
