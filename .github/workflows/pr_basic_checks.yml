@@ -145,7 +145,8 @@ jobs:
         run: |
           which python
           python --version
-          PYTHONPATH=. coverage run -a -m pytest tools/test
+          # PYTHONPATH=. 
+          coverage run -a -m pytest tools/test
           python tools/test/pylint.py
           coverage run -a tools/project.py -S | sed -n '/^Total/p'
           coverage html
