@@ -23,4 +23,4 @@ jobs:
       - 
         name: Hack
         run: |
-          python ./.github/workflows/ci_scripts/github_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} )
+          python ./.github/workflows/ci_scripts/github_utils.py -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
