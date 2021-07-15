@@ -180,7 +180,8 @@ jobs:
 
   Pin-validation:
     runs-on: ubuntu-latest
-
+    container:
+      image: ghcr.io/saheerb/mbed-os-env:master-test
     steps:
       -
         name: Checkout repo
@@ -188,14 +189,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.7'
+      # - uses: actions/setup-python@v2
+      #   with:
+      #     python-version: '3.7'
 
-      -
-        name: install dependencies
-        run: |
-          pip install tabulate argparse
+      # -
+      #   name: install dependencies
+      #   run: |
+      #     pip install tabulate argparse
 
       -
         name: validate pins
