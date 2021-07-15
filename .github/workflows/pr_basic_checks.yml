@@ -122,6 +122,36 @@ jobs:
 
   python-tests:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/saheerb/mbed-os-env:master-test
+    steps:
+      -
+        name: Checkout repo
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+
+      # -
+      #   name: install dependencies
+      #   run: |
+      #     pip install -r requirements.txt
+      #     pip install icetea pytz
+      #     pip install mock==2.0.0 attrs==19.1.0 pytest==3.3.0 'pylint>=1.9,<2' 'hypothesis>=3,<4' 'coverage>=4.5,<5'
+
+      -
+        name: pytest
+        run: |
+          which python
+          python --version
+          PYTHONPATH=. coverage run -a -m pytest tools/test
+          python tools/test/pylint.py
+          coverage run -a tools/project.py -S | sed -n '/^Total/p'
+          coverage html
+
+  python-tests-vm:
+    runs-on: ubuntu-latest
 
     steps:
       -
