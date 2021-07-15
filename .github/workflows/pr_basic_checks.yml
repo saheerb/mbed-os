@@ -202,7 +202,7 @@ jobs:
         name: validate pins
         run: |
           set -x
-          ( find . '.*[\\|\/]PinNames.h$' || true ) \
+          ( find . -name '.*[\\|\/]PinNames.h$' || true ) \
             | while read file; do python ./hal/tests/pinvalidate/pinvalidate.py -vfp "${file}"; done
           git diff --exit-code --diff-filter=d --color
 
