@@ -349,7 +349,7 @@ jobs:
 
           # apt-get install gcovr ccache -y
           mbedtools configure -p ${{ env.ROOT}} -t ${{ env.TOOLCHAIN }} -m ${{ env.TARGET_NAME }} --mbed-os-path .
-          cmake -S ${ROOT} -B ${{ env.ROOT }}/cmake_build/${TARGET_NAME}/${{ env.PROFILE }}/${{ env.TOOLCHAIN }}/ -GNinja -DCMAKE_BUILD_TYPE=${{ env.PROFILE }}
+          cmake -S ${env.ROOT} -B ${{ env.ROOT }}/cmake_build/${TARGET_NAME}/${{ env.PROFILE }}/${{ env.TOOLCHAIN }}/ -GNinja -DCMAKE_BUILD_TYPE=${{ env.PROFILE }}
           cmake --build ${{ env.ROOT }}/cmake_build/${{ env.TARGET_NAME }}/${{ env.PROFILE }}/${{ env.TOOLCHAIN }}/
 
       -
