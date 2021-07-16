@@ -204,6 +204,39 @@ jobs:
             | while read file; do python ./hal/tests/pinvalidate/pinvalidate.py -vfp "${file}"; done
           git diff --exit-code --diff-filter=d --color
 
+  cmake-vm-7-old:
+    runs-on: ubuntu-latest
+
+    steps:
+      -
+        name: Checkout repo
+        uses: actions/checkout@v2
+
+      -
+        name: install dependencies
+        run: |
+          which python
+          python --version
+          sudo apt-get update -y
+          sudo apt-get install -y ninja-build g++-7 gcovr ccache 
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      -
+        name: install dependencies
+        run: |
+          pip install cmake
+
+      -
+        name: cmake unittest
+        run: |
+          echo ctest --build-and-test . build --build-generator Ninja --build-options -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_C_COMPILER=gcc-7 --test-command ctest        
+          ctest --build-and-test . build --build-generator Ninja --build-options -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_C_COMPILER=gcc-7 --test-command ctest        
+          gcovr --gcov-executable gcov-7 -r . ./build -s -e ".*\.h" --exclude-directories=$TRAVIS_BUILD_DIR/build/UNITTESTS --exclude-directories=$TRAVIS_BUILD_DIR/build/_deps
+          ccache -s
+
   cmake-vm-7:
     runs-on: ubuntu-latest
 
