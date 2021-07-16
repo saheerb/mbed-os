@@ -204,6 +204,45 @@ jobs:
             | while read file; do python ./hal/tests/pinvalidate/pinvalidate.py -vfp "${file}"; done
           git diff --exit-code --diff-filter=d --color
 
+  cmake-vm:
+    runs-on: ubuntu-latest
+
+    steps:
+      -
+        name: Checkout repo
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      -
+        name: install dependencies
+        run: |
+          pip install -r requirements.txt 
+          pip install cmake
+
+
+      -
+        name: install gcc
+        run: |
+          mkdir /toolchain
+          cd /toolchain
+          TARBALL="gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2" \
+          wget -q https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/${TARBALL} \
+          tar -xjf ${TARBALL}
+          
+
+      -
+        name: cmake unittest
+        run: |
+          GCC_ARM_PATH=/toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/
+          export PATH="${PATH}:${MBED_GCC_ARM_PATH}"
+          echo ctest --build-and-test . build --build-generator Ninja --build-options -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_C_COMPILER=gcc-7 --test-command ctest        
+          ctest --build-and-test . build --build-generator Ninja --build-options -DBUILD_TESTING=ON -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_C_COMPILER=gcc-7 --test-command ctest        
+          gcovr --gcov-executable gcov-7 -r . ./build -s -e ".*\.h" --exclude-directories=$TRAVIS_BUILD_DIR/build/UNITTESTS --exclude-directories=$TRAVIS_BUILD_DIR/build/_deps
+          ccache -s
+
   cmake-check:
     env: 
       NAME: mbed-test-mode-check 
