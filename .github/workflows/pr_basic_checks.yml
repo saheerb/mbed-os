@@ -221,8 +221,8 @@ jobs:
         run: |
           pip install -r requirements.txt 
           pip install cmake
-          apt update -y
-          apt install -y ninja-build
+          apt-get update -y
+          apt-get install -y ninja-build
 
       -
         name: install gcc
